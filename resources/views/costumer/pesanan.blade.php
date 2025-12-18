@@ -1,6 +1,6 @@
 @extends('template')
 
-@section('title', 'Detail Produk')
+@section('title', 'Pesanan')
 
 @section('content')
 <div class="flex flex-col p-6 items-center w-full">

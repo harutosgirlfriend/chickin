@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Keranjang;
 use App\Models\Users;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -42,6 +43,8 @@ class HomeController extends Controller
             'password' => Hash::make($request->password),
             'no_hp' => $request->no_hp,
             'role' => 'customer',
+            'created_at'=> Carbon::now(),
+            'updated_at'=> Carbon::now(),
         ]);
 
         return view('admin.login');

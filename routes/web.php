@@ -66,6 +66,19 @@ Route::middleware(['keranjang'])->group(function () {
 // Transaksi
  Route::get('/transaksi/selesai', [TransaksiController::class, 'selesai'])->name('transaksi.selesai');
 
+ //profile
+ Route::get('/costumer/profile', [CostumerController::class, 'profile'])->name('costumer.profile');
+ Route::post('/costumer/profile/update', [CostumerController::class, 'update'])->name('costumer.update');
+ Route::get('/costumer/profile/changePassword', [CostumerController::class, 'changePassword'])->name('costumer.profile.changePassword');
+ Route::post('/costumer/profile/ubahPassword', [CostumerController::class, 'ubahPassword'])->name('costumer.profile.ubahPassword');
+Route::post(
+    '/costumer/profile/update-photo',
+    [CostumerController::class, 'updatePhoto']
+)->name('costumer.profile.updatePhoto');
+Route::delete('/costumer/profile/photo', [CostumerController::class, 'deletePhoto'])
+    ->name('costumer.profile.deletePhoto');
+
+
  Route::post('/cari/qr', [CartController::class, 'qris'])->name('qris');
 
 

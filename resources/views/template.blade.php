@@ -69,8 +69,6 @@
             font-weight: <weight>;
             font-style: bold;
         }
-
-     
     </style>
 </head>
 
@@ -180,7 +178,7 @@
                                 class="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ">
                                 <span class="absolute -inset-1.5"></span>
                                 <span class="sr-only">Open user menu</span>
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                <img src="{{ auth()->user()->gambar ? asset('images/profile/' . auth()->user()->gambar) : asset('images/profile/default.jpg') }}"
                                     alt=""
                                     class="size-8 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10" />
                             </button>
@@ -199,8 +197,8 @@
                                     @endif
                                 @endauth
 
-                                <a href="#"
-                                    class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]">Settings</a>
+                                <a href="{{ route('costumer.profile') }}"
+                                    class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]">Profile</a>
                                 <a href="{{ route('logout') }}"
                                     class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]">Sign
                                     out</a>
@@ -428,6 +426,12 @@
     </div>
 
     <main class="flex-1 overflow-hidden">
+        @if (session('success'))
+            <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg mb-6">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if (session('error'))
             <script>
                 Swal.fire({

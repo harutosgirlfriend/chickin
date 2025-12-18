@@ -1,6 +1,6 @@
 @extends('template')
 
-@section('title', 'Detail Produk')
+@section('title', 'Dashboard')
 
 @section('content')
     <div class="w-full lg:h-[500px] bg-cover bg-center hero-section">

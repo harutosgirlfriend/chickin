@@ -1,6 +1,6 @@
 @extends('template')
 
-@section('title', 'Detail Produk')
+@section('title', 'Detail Pesanan')
 
 @section('content')
 

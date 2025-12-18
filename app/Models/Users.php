@@ -15,9 +15,9 @@ class Users extends Model implements Authenticatable
 
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
-    protected $fillable = ['nama', 'no_hp', 'password', 'email', 'role'];
+    protected $fillable = ['nama', 'no_hp', 'password', 'email', 'role','created_at', 'updated_at','gambar'];
 
     public function keranjang()
     {

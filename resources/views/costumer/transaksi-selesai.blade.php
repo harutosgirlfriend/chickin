@@ -1,6 +1,6 @@
 @extends('template')
 
-@section('title', 'Berita dan Promo')
+@section('title', 'Transaksi Selesai')
 
 @section('content')
     <div class=" flex justify-center items-center">
