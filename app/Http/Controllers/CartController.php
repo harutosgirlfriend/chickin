@@ -251,7 +251,7 @@ public function generateSnapToken(Request $request)
     }
 
     $subtotal = (float) $request->subtotal;
-    $ongkir   = 10000;
+    $ongkir   = $request->ongkir ?? 0  ;
     $diskon   = 0;
 
     // HITUNG DISKON
@@ -314,6 +314,7 @@ public function generateSnapToken(Request $request)
 
 public function transaksi(Request $request)
     {
+$totalHarga = 0;
 $pembayaran = $request->metode_pembayaran; // ← ambil dari form
 
 if($pembayaran == 'nontunai'){
@@ -344,7 +345,7 @@ else{
     }
 
 
-    $ongkir = 10000;
+    $ongkir = $request->ongkir ?? 0;
 
     $totalBayar = $totalHarga - $jumlahDiskon + $ongkir;
 
@@ -378,6 +379,10 @@ else{
                     'kode_product' => $item['kode_product'],
                     'harga' => $item['harga'],
                 ]);
+               Keranjang::where('kode_product', $item['kode_product'])
+    ->where('id_user', Auth::id())
+    ->delete();
+
               
             }
         } else {
@@ -392,7 +397,7 @@ else{
         }
      
 
-        return view('costumer.transaksi-selesai');
+        return redirect()->route('transaksi.selesai');
 
     }
 

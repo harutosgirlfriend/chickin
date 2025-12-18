@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BeritaPromoController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CostumerController;
+use App\Http\Controllers\Feedbacks;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\PaymentController;
@@ -34,6 +35,7 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
     Route::get('/dashboard/admin', [AdminController::class, 'dashboard'])->name('dashboard.admin');
     Route::get('/admin/datapesanan', [AdminController::class, 'pesanan'])->name('admin.pesanan');
     Route::get('/admin/datapesanan/detail/{kode_transaksi}', [AdminController::class, 'detailPesanan'])->name('admin.pesanan.detail');
+   
 });
 
 Route::middleware(['keranjang'])->group(function () {
@@ -60,7 +62,25 @@ Route::middleware(['keranjang'])->group(function () {
     Route::post('/keranjang/update', [CartController::class, 'updateJumlahKeranjang'])->middleware('auth');
     Route::match(['get', 'post'], '/simpan/product', [ProductController::class, 'simpan'])->name('product.simpan');
     Route::match(['get', 'post'], '/edit/product/{kode_product}', [ProductController::class, 'update'])->name('edit.product');
+
+// Transaksi
+ Route::get('/transaksi/selesai', [TransaksiController::class, 'selesai'])->name('transaksi.selesai');
+
  Route::post('/cari/qr', [CartController::class, 'qris'])->name('qris');
+
+
+ //komentar
+Route::get(
+    '/order/{order}/rate',
+    [Feedbacks::class, 'create']
+)->middleware('auth')->name('order.rate');
+
+Route::post(
+    '/order/{order}/product/{product}/rate',
+    [Feedbacks::class, 'store']
+)->middleware('auth')->name('product.rate');
+
+
 });
 Route::get('/regis/akun', [AdminController::class, 'registrasi'])->name('regisAkun');
 Route::get('/transaksi/{orderId}/status', [CartController::class, 'checkStatus']);
@@ -69,3 +89,5 @@ Route::get('/transaksi/{orderId}/status', [CartController::class, 'checkStatus']
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'cekadmin'])->group(function() {
     Route::resource('vouchers', VouchersController::class);
 });
+
+ Route::post('/admin/pesanan/update-status', [TransaksiController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');

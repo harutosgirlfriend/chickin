@@ -32,4 +32,8 @@ class Users extends Model implements Authenticatable
     {
         return $this->hasMany(ChatModel::class, 'id_pengirim', 'id');
     }
+    public function feedback()
+    {
+        return $this->hasMany(Fedbacks::class, 'id_user', 'id');
+    }
 }

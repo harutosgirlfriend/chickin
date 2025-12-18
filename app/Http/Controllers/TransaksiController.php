@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetailTransaksi;
+use App\Models\Tracking;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,11 @@ class TransaksiController extends Controller
     {
 
         return view('admin.regis');
+    }
+    public function selesai()
+    {
+
+        return view('costumer.transaksi-selesai');
     }
 
     public function pesanan()
@@ -54,14 +60,55 @@ class TransaksiController extends Controller
 
     public function detailPesanan(Request $request)
     {
+           $pesanan = Transaksi::with(['users'])
+            ->where('kode_transaksi', $request->kode_transaksi)
+            ->first();
+        // dd($pesanan);
         $detailTransaksi = DetailTransaksi::with(['transaksi', 'product'])
             ->where('kode_transaksi', $request->kode_transaksi)
             ->get();
+        $akun = Transaksi::with(['users'])
+            ->where('kode_transaksi', $request->kode_transaksi)
+            ->get();
+        // dd($akun);
+        $tracking = Tracking::with(['transaksi'])
+            ->where('kode_transaksi', $request->kode_transaksi)
+            ->orderBy('kode_tracking', 'desc')
+            ->get();
 
-        // dd( $detailTransaksi);
-        return view('costumer.detail-pesanan', ['pesanan' => $detailTransaksi, 'kode_transaksi' => $request->kode_transaksi]);
+        return view('costumer.detail-pesanan', ['pesanan' => $pesanan, 'products' => $detailTransaksi, 'tracking' => $tracking, 'status' => $pesanan['status'], 'akun' => $akun]);
     }
  public function riwayat(){
     return view('costumer.transaksi-selesai');
  }
+public function updateStatus(Request $request)
+{
+    $request->validate([
+        'kode_transaksi' => 'required',
+        'status' => 'required'
+    ]);
+
+    $pesanan = Transaksi::where('kode_transaksi', $request->kode_transaksi)->firstOrFail();
+
+
+    $alurStatus = [
+        'Pending' => ['Disetujui', 'Ditolak'],
+        'Disetujui' => ['Proses Pengantaran'],
+        'Proses Pengantaran' => ['Diterima'],
+        'Diterima' => [],
+        'Ditolak' => []
+    ];
+
+    // cek validasi alur
+    if (!in_array($request->status, $alurStatus[$pesanan->status])) {
+        return back()->with('error', 'Perubahan status tidak valid');
+    }
+
+    $pesanan->status = $request->status;
+    $pesanan->save();
+
+    return back()->with('success', 'Status pesanan berhasil diperbarui');
+}
+
+
 }

@@ -69,6 +69,8 @@
             font-weight: <weight>;
             font-style: bold;
         }
+
+     
     </style>
 </head>
 
@@ -249,9 +251,10 @@
             </div>
         </el-disclosure>
     </nav>
+
     <div id="keranjang-container"
         class="fixed top-8 right-0 z-50 w-full md:w-1/3 h-screen bg-white shadow-2xl transform translate-x-full transition-transform duration-300 hidden">
-        <div class="shadow-md rounded p-10 w-full">
+        <div class="rounded p-10 w-full">
             <div class="icon-silang flex justify-between">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6 cursor-pointer">
@@ -259,92 +262,167 @@
                 </svg>
                 <h2 class="text-lg font-semibold">Keranjang Anda</h2>
             </div>
+            @if ($total_item > 0)
+                <form id="checkout-form" action="@auth {{ route('checkout.auth') }} @endauth" method="POST">
+                    @csrf
 
-            <form id="checkout-form" action="@auth {{ route('checkout.auth') }} @endauth" method="POST">
-                @csrf
+                    <div class="flex items-center gap-2 mt-4 mb-2">
+                        <input type="checkbox" id="select-all" class="w-4 h-4 cursor-pointer">
+                        <label for="select-all" class="text-sm font-medium cursor-pointer">Pilih Semua</label>
+                    </div>
 
-                <div class="flex items-center gap-2 mt-4 mb-2">
-                    <input type="checkbox" id="select-all" class="w-4 h-4 cursor-pointer">
-                    <label for="select-all" class="text-sm font-medium cursor-pointer">Pilih Semua</label>
-                </div>
+                    <div class="list overflow-auto h-[60vh] pr-2">
 
-                <div class="list overflow-auto h-[60vh]">
-                    <div class="space-y-4 isi-keranjang">
-                        @auth
-                            @foreach ($keranjang as $item)
-                                <div class="flex items-center justify-between border-b pb-3"
-                                    id="keranjangno{{ $item->id }}">
-                                    <div class="flex items-center space-x-3">
-                                        <input type="checkbox" id="checkbox{{ $item->id }}"
-                                            class="item-checkbox w-4 h-4 {{ $item->product->stok <= 0 || $item->product->stok < $item->jumlah ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
-                                            data-id="{{ $item->id }}" data-harga="{{ $item->product->harga }}"
-                                            data-jumlah="{{ $item->jumlah }}"
-                                            @if ($item->product->stok <= 0 || $item->product->stok < $item->jumlah) disabled @endif>
-                                        <div class="relative">
-                                            <img src="{{ asset('images/product/' . $item->product->gambar) }}"
-                                                alt="Produk" class="w-16 h-16 rounded-md object-cover">
-                                            @if ($item->product->stok <= 0)
-                                                <div class="absolute bottom-0 left-0 w-16 h-5 bg-black bg-opacity-10 text-white text-center text-xs"
-                                                    style="background-color: rgba(0, 0, 0, 0.5);">
-                                                    stok habis
-                                                </div>
+                        <div class="space-y-4 isi-keranjang p-5">
+                            @auth
+                                @foreach ($keranjang as $item)
+                                    <div class="flex items-start justify-between p-5 pb-4
+            bg-white rounded-md shadow-md hover:shadow-2xl transition"
+                                        id="keranjangno{{ $item->id }}">
+
+                                        <!-- LEFT -->
+                                        <div class="flex items-start gap-3">
+                                            <input type="checkbox" id="checkbox{{ $item->id }}"
+                                                class="mt-1 w-4 h-4 
+                            {{ $item->product->stok <= 0 || $item->product->stok < $item->jumlah
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'item-checkbox cursor-pointer' }}"
+                                                data-id="{{ $item->id }}" data-harga="{{ $item->product->harga }}"
+                                                data-jumlah="{{ $item->jumlah }}"
+                                                @if ($item->product->stok <= 0 || $item->product->stok < $item->jumlah) disabled @endif>
+
+                                            <div class="relative shrink-0">
+                                                <img src="{{ asset('images/product/' . $item->product->gambar) }}"
+                                                    alt="Produk" class="w-16 h-16 rounded-lg object-cover  bg-white">
+
+                                                @if ($item->product->stok <= 0)
+                                                    <div
+                                                        class="absolute bottom-0 left-0 w-full h-5 bg-black/60 text-white text-[10px]
+                                           flex items-center justify-center rounded-b-lg">
+                                                        stok habis
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="space-y-1">
+                                                <input type="hidden" value="{{ $item->product->stok }}"
+                                                    id="jumlahStok{{ $item->id }}">
+
+                                                <p class="font-medium text-sm leading-tight">
+                                                    {{ $item->product->nama_product }}
+                                                </p>
+
+                                                <p class="text-xs text-gray-500">
+                                                    Rp {{ number_format($item->product->harga) }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- RIGHT -->
+                                        <div class="text-right space-y-2">
+                                            @if ($item->product->stok < $item->jumlah)
+                                                <p class="text-xs text-red-600 font-medium"
+                                                    id="status-stok{{ $item->id }}">
+                                                    Stok tidak mencukupi
+                                                </p>
                                             @endif
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">{{ $item->product->nama_product }}</p>
-                                            <p class="text-sm text-gray-600">Rp {{ number_format($item->product->harga) }}
+
+                                            <div class="flex items-center justify-end">
+                                                <button type="button"
+                                                    class="kurangiKer
+                                       border border-red-500 bg-red-50 text-red-600
+                                       hover:bg-red-500 hover:text-white
+                                       px-2 py-1 text-sm rounded-md transition"
+                                                    data-id="{{ $item->id }}"
+                                                    @if ($item->product->stok <= 0) disabled @endif>
+                                                    -
+                                                </button>
+
+                                                <span class="jumlahKer  px-3 py-1 text-sm bg-white"
+                                                    id="jumlahKer{{ $item->id }}" data-id="{{ $item->id }}">
+                                                    {{ $item->jumlah }}
+                                                </span>
+
+                                                <button type="button"
+                                                    class="tambahKer
+                                       border border-green-500 bg-green-50 text-green-600
+                                       hover:bg-green-500 hover:text-white
+                                       px-2 py-1 text-sm rounded-md transition"
+                                                    data-jumlah="{{ $item->jumlah }}" data-id="{{ $item->id }}"
+                                                    data-stok="{{ $item->product->stok }}">
+                                                    +
+                                                </button>
+                                            </div>
+
+                                            <p class="text-sm font-semibold text-gray-800 subtotal"
+                                                id="sub{{ $item->id }}">
+                                                Rp {{ number_format($item->jumlah * $item->product->harga) }}
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        @if ($item->product->stok < $item->jumlah)
-                                            <p class="text-gray-600" id="status-stok{{ $item->id }}">
-                                                Stok tidak mencukupi
-                                            </p>
-                                        @endif
+                                @endforeach
+                            @endauth
+                        </div>
+                    </div>
 
-                                        <div class="flex items-center">
-                                            <button type="button"
-                                                class="kurangiKer border border-gray-400 px-1 py-1 mx-0"
-                                                data-id="{{ $item->id }}"
-                                                @if ($item->product->stok <= 0) disabled @endif>-</button>
-                                            <span class="jumlahKer border-y border-gray-400 px-1 py-1 mx-0"
-                                                id="jumlahKer{{ $item->id }}"
-                                                data-id="{{ $item->id }}">{{ $item->jumlah }}</span>
-                                            <button type="button" class="tambahKer border border-gray-400 px-1 py-1 mx-0"
-                                                data-jumlah="{{ $item->jumlah }}" data-id="{{ $item->id }}"
-                                                data-stok="{{ $item->product->stok }}">+</button>
-                                        </div>
 
-                                        <p class="text-gray-600 subtotal" id="sub{{ $item->id }}">
-                                            Rp {{ number_format($item->jumlah * $item->product->harga) }}
-                                        </p>
+
+
+                    <div class="mt-6 border-t pt-4">
+                        <div class="flex justify-between text-lg font-semibold mb-3">
+                            <span>Total</span>
+                            <span id="total-display">Rp 0</span>
+                        </div>
+
+                        <input type="hidden" id="total-input" name="total" value="0">
+                        <input type="hidden" id="selected-items" name="selected_items" value="[]">
+
+                        <button type="submit"
+                            class="w-full bg-[#b25353] text-white py-2 rounded  transition checkout">
+                            Checkout
+                        </button>
+                    </div>
+                </form>
+            @else
+                <main class="flex-grow flex flex-col items-center justify-center p-6 text-center">
+
+                    <div class="mb-8 p-4 bg-orange-100 rounded-lg relative">
+                        <div
+                            class="w-24 h-24 flex flex-col items-center justify-center bg-yellow-600 bg-opacity-10 rounded-lg border-2 border-yellow-600 border-opacity-20 relative">
+                            <div
+                                class="w-16 h-16 bg-orange-300 rounded-t-lg -mt-4 relative transform -rotate-2 shadow-inner">
+                                <div class="absolute inset-x-0 bottom-0 h-1/2 bg-orange-200"></div>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <div class="flex space-x-3 mt-4">
+                                        <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
+                                        <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
                                     </div>
+                                    <div class="w-4 h-0.5 bg-gray-600 rounded-full mt-1.5 transform rotate-3"></div>
                                 </div>
-                            @endforeach
-                        @endauth
-
-                    </div>
-                </div>
-
-
-                <div class="mt-6 border-t pt-4">
-                    <div class="flex justify-between text-lg font-semibold mb-3">
-                        <span>Total</span>
-                        <span id="total-display">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="absolute -top-1 -left-1 text-yellow-500 text-2xl transform rotate-12">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M5 3s4 0 7 7c3-7 7-7 7-7m-7 7v11" />
+                            </svg>
+                        </div>
                     </div>
 
-                    <input type="hidden" id="total-input" name="total" value="0">
-                    <input type="hidden" id="selected-items" name="selected_items" value="[]">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Keranjang anda kosong</h2>
+                    <p class="text-gray-500 mb-8">Mau belanja?</p>
 
-                    <button type="submit"
-                        class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition checkout">
-                        Checkout
-                    </button>
-                </div>
-            </form>
+                    <a href="{{ route('product') }}"
+                        class="w-full bg-[#b25353] text-white font-semibold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow-md">
+                        Belanja
+                    </a>
+                </main>
+            @endif
         </div>
     </div>
+
+
 
     </div>
     </div>

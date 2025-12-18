@@ -40,4 +40,8 @@ class Product extends Model
     {
         return $this->hasMany(ProductGambar::class, 'kode_product', 'kode_product');
     }
+    public function feedback()
+    {
+        return $this->hasMany(Fedbacks::class, 'kode_product', 'kode_product');
+    }
 }

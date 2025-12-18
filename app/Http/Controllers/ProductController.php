@@ -16,20 +16,20 @@ class ProductController extends Controller
 
     public function index()
     {
-        $product = Product::all();
+    $product = Product::with('feedback')->get();
 
         return view('costumer.product', ['product' => $product]);
     }
 
-    public function detail($kode_product)
-    {
-        // $kode_product = Product::find($kode_product);
-        $product = Product::with('productgambar')->where('kode_product',$kode_product)->first();
+public function detail($kode_product)
+{
 
+  
+    $product = Product::with(['productgambar', 'feedback.user'])->where('kode_product',$kode_product)->firstOrFail();
+    // dd($product);
+    return view('costumer.detail', ['product' => $product]);
+}
 
-        //  var_dump($kode_product);
-        return view('costumer.detail', ['product' => $product]);
-    }
 
     public function kategori($kategori)
     {

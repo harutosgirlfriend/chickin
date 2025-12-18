@@ -148,7 +148,7 @@
                 <div class="">
                     <label for="ongkir" class="block text-sm/6 font-medium text-gray-900">Ongkir</label>
                     <div class="mt-2">
-                        <p class="flex items-center rounded-md bg-white pl-3 py-1.5 h-[38px]">
+                        <p id="ongkirText" class="flex items-center rounded-md bg-white pl-3 py-1.5 h-[38px]">
 
                             Rp 10.000
                         </p>
@@ -201,12 +201,13 @@
                     <div class="mt-2">
                         <p id="totalText"
                             class="flex items-center rounded-md bg-white pl-3 py-1.5 border border-gray-300 h-[38px]">
-                            Rp {{ number_format($total + 10000) }}
+                            Rp {{ number_format($total) }}
                         </p>
 
-                        <input type="hidden" id="totalHarga" value="{{ $total }}" name="subtotal">
-                        <input type="hidden" id="ongkir" value="10000">
+                        <input type="hidden" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
+                        <input type="hidden" id="ongkir" value="0" name="ongkir">
                         <input type="hidden" name="id_voucher" id="voucherInput">
+
                     </div>
                 </div>
 
@@ -226,6 +227,10 @@
                     </label>
 
                     {{-- 10. Tombol Beli Sekarang 2 (Form Submit) --}}
+
+                    <p>Jarak ke lokasi anda: <strong id="jarak">-</strong></p>
+                    <input type="hidden" name="jarak" id="jarak_input">
+
                     <div class="md:col-span-2 flex justify-center items-center w-full mt-4">
                         <button class="p-3 bg-indigo-500 w-full rounded-md" type="submit" id="link">
                             {{-- Tambahkan w-full dan rounded-md --}}
@@ -309,6 +314,18 @@
         }
     </script> --}}
     <!-- Loading Overlay -->
+
+    <div id="ongkirLoading" class="hidden flex items-center gap-2 text-sm text-gray-600 mt-2">
+        <svg class="animate-spin h-4 w-4 text-indigo-500" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                fill="none"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a12 12 0 00-12 12h4z"></path>
+        </svg>
+        <span>Menghitung ongkir...</span>
+    </div>
+
+
+
     <div id="loading" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
         <div class="w-16 h-16 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
     </div>
@@ -345,9 +362,74 @@
             document.getElementById('voucherInput').value = selected.value;
         });
 
+        function validasiSebelumBayar() {
+            const alamat = document.getElementById('alamat').value.trim();
+            const kabupaten = document.getElementById('kabupaten').value;
+            const kecamatan = document.getElementById('kecamatan').value;
+
+            const voucherSelect = document.getElementById('voucher_select');
+            const voucherDipilih = voucherSelect.value;
+            const jumlahVoucher = voucherSelect.options.length - 1;
+
+            if (!alamat) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Alamat belum diisi',
+                    text: 'Harap masukkan alamat pengiriman terlebih dahulu'
+                });
+                return false;
+            }
+
+            if (!kabupaten) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kabupaten belum dipilih',
+                    text: 'Harap pilih kabupaten/kota terlebih dahulu'
+                });
+                return false;
+            }
+
+            if (!kecamatan) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kecamatan belum dipilih',
+                    text: 'Harap pilih kecamatan terlebih dahulu'
+                });
+                return false;
+            }
+
+            // 🔥 Kalau ada voucher tersedia tapi belum dipilih
+            if (jumlahVoucher > 0 && !voucherDipilih) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Voucher belum dipilih',
+                    text: 'Silakan pilih voucher terlebih dahulu atau pilih "Tanpa Voucher"'
+                });
+                return false;
+            }
+
+            return true;
+        }
+
+
+
         const payRadio = document.getElementById('pay-button');
 
         payRadio.addEventListener('click', async function() {
+
+            if (!validasiSebelumBayar()) {
+                this.checked = false;
+                return;
+            }
+
+            if (snapToken !== '') {
+                window.snap.pay(snapToken, {
+                    onSuccess: function() {
+                        document.getElementById('checkoutForm').submit();
+                    }
+                });
+                return;
+            }
 
             if (snapToken !== '') {
                 window.snap.pay(snapToken, {
@@ -414,23 +496,9 @@
 
 
         $(document).ready(function() {
-            let kabSelect = $(`#kabupaten`);
-            let kabupatenSelected = kabSelect.data("selected");
 
-            $('#kabupaten').select2({
-                placeholder: "Pilih Kabupaten/Kota...",
-                allowClear: true
-            });
+            const allowedKabupaten = [
 
-            $('#kecamatan').select2({
-                placeholder: "Pilih Kecamatan...",
-                allowClear: true
-            });
-
-            const allowedKabupaten = [{
-                    id: 3326,
-                    name: "Kabupaten Pekalongan"
-                },
                 {
                     id: 3375,
                     name: "Kota Pekalongan"
@@ -441,44 +509,134 @@
                 }
             ];
 
+            $('#kabupaten').select2({
+                placeholder: "Pilih Kabupaten/Kota"
+            });
+            $('#kecamatan').select2({
+                placeholder: "Pilih Kecamatan"
+            });
 
-            $('#kabupaten').html('<option value="">Pilih Kabupaten/Kota</option>');
             allowedKabupaten.forEach(k => {
                 $('#kabupaten').append(
-                    `<option value="${k.name}" data-id="${k.id}" ${kabupatenSelected == k.name ? 'selected' : ''}>${k.name}</option>`
+                    `<option value="${k.name}" data-id="${k.id}">${k.name}</option>`
                 );
             });
-            $('#kabupaten').trigger('change');
 
-
+            // =====================
+            // KABUPATEN DIPILIH
+            // =====================
             $('#kabupaten').on('change', function() {
-                let kabID = $('#kabupaten option:selected').data("id");
+                const kabID = $('#kabupaten option:selected').data('id');
 
-                $('#kecamatan').html('<option value="">Memuat...</option>');
-                $('#kecamatan').trigger('change');
+                $('#kecamatan').html('<option>Loading...</option>');
 
-                if (!kabID) {
-                    $('#kecamatan').html('<option value="">Pilih Kecamatan</option>');
-                    return;
-                }
-
+                if (!kabID) return;
 
                 fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${kabID}.json`)
                     .then(res => res.json())
                     .then(data => {
                         $('#kecamatan').html('<option value="">Pilih Kecamatan</option>');
-
                         data.forEach(kec => {
-                            $('#kecamatan').append(
-                                `<option value="${kec.name}">${kec.name}</option>`
-                            );
+                            $('#kecamatan').append(`<option>${kec.name}</option>`);
                         });
-
-                        $('#kecamatan').trigger('change');
                     });
             });
 
+            // =====================
+            // KECAMATAN DIPILIH
+            // =====================
+            $('#kecamatan').on('change', function() {
+                const kecamatan = $(this).val();
+                const kabupaten = $('#kabupaten').val();
+                if (!kecamatan) return;
+
+                $('#ongkirLoading').removeClass('hidden');
+                $('#jarak').text('-');
+                $('#ongkirText').text('Menghitung...');
+
+
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+
+                    const lokasi = await getKoordinat(kecamatan, kabupaten);
+                    if (!lokasi) return;
+
+                    const jarak = hitungJarak(userLat, userLng, lokasi.lat, lokasi.lng);
+                    const km = Math.ceil(jarak);
+                    const ongkir = km * 2000;
+
+                    $('#jarak').text(km + ' KM');
+                    $('#jarak_input').val(km);
+                    $('#ongkir').val(ongkir);
+                    $('#ongkirText').text('Rp ' + ongkir.toLocaleString('id-ID'));
+
+                    $('#ongkirLoading').addClass('hidden');
+
+                    hitungTotalAkhir();
+                });
+            });
         });
+
+        /* =========================
+           HELPER
+        ========================= */
+        function getKoordinat(kec, kab) {
+            return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${kec}, ${kab}, Indonesia`)
+                .then(res => res.json())
+                .then(d => d[0] ? {
+                    lat: +d[0].lat,
+                    lng: +d[0].lon
+                } : null);
+        }
+
+        function hitungJarak(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function hitungTotalAkhir() {
+            const subtotal = parseFloat(document.getElementById('totalHarga').value) || 0;
+            const ongkir = parseFloat(document.getElementById('ongkir').value) || 0;
+
+            const voucherSelect = document.getElementById('voucher_select');
+            const selected = voucherSelect.options[voucherSelect.selectedIndex];
+
+            let diskon = 0;
+
+            if (selected && selected.dataset.type) {
+                const tipe = selected.dataset.type;
+                const nilai = parseFloat(selected.dataset.value || 0);
+                const min = parseFloat(selected.dataset.min || 0);
+
+                if (subtotal >= min) {
+                    if (tipe === 'persen') {
+                        diskon = subtotal * (nilai / 100);
+                    } else if (tipe === 'nominal') {
+                        diskon = nilai;
+                    }
+                }
+            }
+
+            const total = Math.max(subtotal - diskon, 0) + ongkir;
+
+            document.getElementById('totalText').innerText =
+                'Rp ' + total.toLocaleString('id-ID');
+
+            return total;
+        }
+
+        document.getElementById('voucher_select').addEventListener('change', function() {
+            document.getElementById('voucherInput').value = this.value;
+            hitungTotalAkhir();
+        });
+
+
+
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         async function cekPembayaran(event) {
             event.preventDefault();

@@ -47,6 +47,7 @@ tambahiii.forEach((tumb) => {
 
         jumlahKer.innerHTML = jumlahBaru;
         jumlahKer.setAttribute("data-jumlah", jumlahBaru);
+        validasiCheckboxStok(id);
         updateDatabase(id, jumlahBaru, csrfToken, jumlahKer, jumlahLama);
     });
 });
@@ -55,6 +56,8 @@ kurangiii.forEach((tumb) => {
         e.preventDefault();
         const id = this.getAttribute("data-id");
         const jumlahKer = document.getElementById(`jumlahKer${id}`);
+        const stok = document.getElementById(`jumlahStok${id}`);
+        const status = document.getElementById(`status-stok${id}`);
 
         if (!jumlahKer) {
             console.error(
@@ -64,6 +67,7 @@ kurangiii.forEach((tumb) => {
         }
 
         let jumlahLama = parseInt(jumlahKer.textContent, 10);
+        let jumlahStok = parseInt(stok.value, 10);
         if (isNaN(jumlahLama)) {
             jumlahLama = 0;
         }
@@ -73,16 +77,21 @@ kurangiii.forEach((tumb) => {
             alert("apakah anda ingin menghapus item ini?");
         }
         const cek = document.getElementById(`checkbox${id}`);
-        console.log(id);
+        // console.log(jumlahStok);
 
-        if (jumlahBaru < jumlahLama) {
+        if (jumlahBaru < jumlahStok) {
             cek.removeAttribute("disabled");
             cek.classList.remove("opacity-50");
             cek.classList.remove("cursor-not-allowed");
             cek.classList.add("cursor-pointer");
+            cek.classList.add("item-checkbox");
+            if (status) {
+                status.setAttribute("hidden", "true");
+            }
         }
         jumlahKer.innerHTML = jumlahBaru;
         jumlahKer.setAttribute("data-jumlah", jumlahBaru);
+        validasiCheckboxStok(id);
         updateDatabase(id, jumlahBaru, csrfToken, jumlahKer, jumlahLama);
     });
 });
@@ -122,17 +131,11 @@ function updateDatabase(itemId, newQuantity, token, element, oldQuantity) {
             if (data.success) {
                 if (data.new_subtotal_item !== undefined) {
                     const sub = document.getElementById(`sub${itemId}`);
-                    const status = document.getElementById(
-                        `status-stok${itemId}`
-                    );
 
                     cek.setAttribute("data-jumlah", newQuantity);
                     updateTotal();
                     sub.textContent =
                         "Rp " + data.new_subtotal_item.toLocaleString("id-ID");
-                    if (status) {
-                        status.setAttribute("hidden", "true");
-                    }
                 } else {
                     const carttt = document.getElementById(
                         `keranjangno${itemId}`
@@ -168,21 +171,41 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         notif.classList.add("hidden");
     }
-    updateTotal();
-    checkboxes.forEach((cb) => cb.addEventListener("change", updateTotal));
 
     selectAll.addEventListener("change", function () {
         const checked = this.checked;
-        checkboxes.forEach((cb) => (cb.checked = checked));
+
+        getCheckboxes().forEach((cb) => {
+            if (!cb.disabled) {
+                cb.checked = checked;
+            }
+        });
+
         updateTotal();
     });
+document.addEventListener("change", function (e) {
+        if (e.target && e.target.classList.contains("item-checkbox")) {
+            updateTotal();
+        }
+    });
+
+    document.querySelectorAll(".kurangiKer").forEach((btn) => {
+        const id = btn.dataset.id;
+        validasiCheckboxStok(id);
+    });
+
+    // ⬇️ TAMBAHAN PENTING (biar awal load langsung sinkron)
+    updateTotal();
 });
+
 function updateTotal() {
     let total = 0;
     let selectedItems = [];
 
+    const checkboxes = getCheckboxes(); // ⬅️ KUNCI
+
     checkboxes.forEach((checkbox) => {
-        if (checkbox.checked) {
+        if (checkbox.checked && !checkbox.disabled) {
             const harga = parseFloat(checkbox.dataset.harga);
             const jumlah = parseInt(checkbox.dataset.jumlah);
             const id = checkbox.dataset.id;
@@ -196,9 +219,12 @@ function updateTotal() {
     totalInput.value = total;
     selectedItemsInput.value = JSON.stringify(selectedItems);
 
+    const checkboxAktif = [...checkboxes].filter((cb) => !cb.disabled);
+
     selectAll.checked =
-        checkboxes.length > 0 && [...checkboxes].every((cb) => cb.checked);
+        checkboxAktif.length > 0 && checkboxAktif.every((cb) => cb.checked);
 }
+
 // const hargaEl = document.getElementById("hargaEl");
 // const subEl = document.querySelector(".subEl");
 // const intharga = document.querySelector(".intharga").value;
@@ -325,5 +351,44 @@ beliBtn.addEventListener("click", function (e) {
             confirmButtonText: "OK",
         });
         e.preventDefault();
+    }
+});
+
+function validasiCheckboxStok(itemId) {
+    const checkbox = document.getElementById(`checkbox${itemId}`);
+    const jumlahKer = document.getElementById(`jumlahKer${itemId}`);
+    const stokEl = document.getElementById(`jumlahStok${itemId}`);
+    const status = document.getElementById(`status-stok${itemId}`);
+
+    if (!checkbox || !jumlahKer || !stokEl) return;
+
+    const jumlah = parseInt(jumlahKer.textContent, 10);
+    const stok = parseInt(stokEl.value, 10);
+
+    if (jumlah > stok) {
+        checkbox.disabled = true;
+        checkbox.checked = false;
+        checkbox.classList.add("opacity-50", "cursor-not-allowed");
+        checkbox.classList.remove("item-checkbox", "cursor-pointer");
+
+        if (status) status.hidden = false;
+    } else {
+        checkbox.disabled = false;
+        checkbox.classList.remove("opacity-50", "cursor-not-allowed");
+        checkbox.classList.add("item-checkbox", "cursor-pointer");
+
+        if (status) status.hidden = true;
+    }
+
+    // ⬇️ TAMBAHAN WAJIB (sinkron total & select-all)
+    updateTotal();
+}
+
+function getCheckboxes() {
+    return document.querySelectorAll('input[id^="checkbox"]');
+}
+document.addEventListener("change", function (e) {
+    if (e.target.matches('input[id^="checkbox"]')) {
+        updateTotal();
     }
 });
