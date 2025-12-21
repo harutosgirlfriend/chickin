@@ -60,6 +60,11 @@ class HomeController extends Controller
 
             return back()->withErrors(['email' => 'Email tidak terdaftar.']);
         }
+         if ($user->status === 'Non Active') {
+        return back()->withErrors([
+            'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.'
+        ]);
+    }
 
         if (Auth::attempt($credentials)) {
 

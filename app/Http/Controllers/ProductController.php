@@ -143,7 +143,8 @@ public function detail($kode_product)
             ]);
 
         // dd($request);
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Product berhasil diupdate.');
+    
     }
 
     private function kode_product()

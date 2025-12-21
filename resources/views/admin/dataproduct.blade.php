@@ -68,7 +68,7 @@
                             </tr>
                         </thead>
 
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody  id="productTable"  class="bg-white divide-y divide-gray-200">
 
 
                             @foreach ($products as $product)
@@ -279,4 +279,16 @@
 
         </div>
     </div>
+    <script>
+document.getElementById('liveSearch').addEventListener('keyup', function () {
+    let keyword = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#productTable tr');
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(keyword) ? '' : 'none';
+    });
+});
+</script>
+
 @endsection

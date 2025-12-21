@@ -35,7 +35,13 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
     Route::get('/dashboard/admin', [AdminController::class, 'dashboard'])->name('dashboard.admin');
     Route::get('/admin/datapesanan', [AdminController::class, 'pesanan'])->name('admin.pesanan');
     Route::get('/admin/datapesanan/detail/{kode_transaksi}', [AdminController::class, 'detailPesanan'])->name('admin.pesanan.detail');
-   
+    Route::get('/admin/management/user', [AdminController::class, 'managementUser'])->name('admin.menegement.user');
+  Route::patch('/admin/users/status', [AdminController::class, 'updateStatus'])
+    ->name('admin.menegement.userupdateStatus');
+Route::get('/admin/pesanan/export-excel', 
+    [AdminController::class, 'exportExcel']
+)->name('admin.pesanan.exportExcel');
+
 });
 
 Route::middleware(['keranjang'])->group(function () {
