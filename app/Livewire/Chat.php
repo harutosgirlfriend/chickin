@@ -4,16 +4,24 @@ namespace App\Livewire;
 
 use App\Models\ChatModel;
 use App\Models\Users;
+use Livewire\WithFileUploads; 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Chat extends Component
 {
+      use WithFileUploads;
     public $newMessage;
+
     public $user;
+
     public $messages;
+
     public $selectedUser;
+
     public $loginId;
+
+    public $photo;
 
     public function render()
     {
@@ -43,11 +51,11 @@ class Chat extends Component
         $this->messages = ChatModel::query()
             ->where(function ($q) use ($penerimaId) {
                 $q->where('id_pengirim', Auth::id())
-                  ->where('id_penerima', $penerimaId);
+                    ->where('id_penerima', $penerimaId);
             })
             ->orWhere(function ($q) use ($penerimaId) {
                 $q->where('id_pengirim', $penerimaId)
-                  ->where('id_penerima', Auth::id());
+                    ->where('id_penerima', Auth::id());
             })
             ->orderBy('created_at', 'asc')
             ->get();
@@ -56,32 +64,38 @@ class Chat extends Component
         $this->markAsRead($penerimaId);
     }
 
-    public function submit()
-    {
-        if (!$this->newMessage) return;
 
-        $penerimaId = auth()->user()->role === 'admin'
-            ? $this->selectedUser?->id
-            : 4;
+public function submit()
+{
+    if (!$this->newMessage && !$this->photo) return;
 
-        $message = ChatModel::create([
-            'id_pengirim' => Auth::id(),
-            'id_penerima' => $penerimaId,
-            'pesan' => $this->newMessage,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'dibaca'=> false
-        ]);
+    $penerimaId = auth()->user()->role === 'admin'
+        ? $this->selectedUser?->id
+        : 4;
 
-        $this->messages->push($message);
-        $this->reset('newMessage');
-        $this->loadMessages();
+    $gambarPath = null;
+
+    if ($this->photo) {
+        $gambarPath = $this->photo->store('chat', 'public');
     }
+
+    $message = ChatModel::create([
+        'id_pengirim' => Auth::id(),
+        'id_penerima' => $penerimaId,
+        'pesan' => $this->newMessage,
+        'gambar' => $gambarPath,
+        'dibaca' => false
+    ]);
+
+    $this->messages->push($message);
+    $this->reset(['newMessage', 'photo']);
+    $this->loadMessages();
+}
 
     public function getListeners()
     {
         return [
-            "echo.private:chat.{$this->loginId},App\\Events\\MessageSent" => 'newChatMessageNotification'
+            "echo.private:chat.{$this->loginId},App\\Events\\MessageSent" => 'newChatMessageNotification',
         ];
     }
 
@@ -97,7 +111,9 @@ class Chat extends Component
 
     public function selectUser($id)
     {
-        if (auth()->user()->role !== 'admin') return;
+        if (auth()->user()->role !== 'admin') {
+            return;
+        }
 
         $this->selectedUser = $this->user->firstWhere('id', $id);
         $this->loadMessages();
@@ -124,14 +140,14 @@ class Chat extends Component
             $users = Users::where('id', 4)->get();
         }
 
-        $users = $users->map(function($pengirim) {
-            $lastMessage = ChatModel::where(function($q) use ($pengirim) {
-                    $q->where('id_pengirim', $pengirim->id)
-                      ->where('id_penerima', auth()->id());
-                })
-                ->orWhere(function($q) use ($pengirim) {
+        $users = $users->map(function ($pengirim) {
+            $lastMessage = ChatModel::where(function ($q) use ($pengirim) {
+                $q->where('id_pengirim', $pengirim->id)
+                    ->where('id_penerima', auth()->id());
+            })
+                ->orWhere(function ($q) use ($pengirim) {
                     $q->where('id_pengirim', auth()->id())
-                      ->where('id_penerima', $pengirim->id);
+                        ->where('id_penerima', $pengirim->id);
                 })
                 ->orderBy('created_at', 'desc')
                 ->first();
@@ -145,7 +161,7 @@ class Chat extends Component
             return $pengirim;
         });
 
-        return $users->sortByDesc(fn($u) => $u->lastMessage ?? now()->subYears(10));
+        return $users->sortByDesc(fn ($u) => $u->lastMessage ?? now()->subYears(10));
     }
 
     public function openChat($pengirimId)

@@ -35,7 +35,7 @@
                 </select>
             </div>
             <div class="mb-2">
-                <label>Maksimal Diskon</label>
+                <label>Maksimal Diskon(kalau tipe diskon persen)</label>
                 <input type="number" name="maks_diskon" class="form-control" step="0.01">
             </div>
             <div class="mt-4 flex justify-end gap-2">

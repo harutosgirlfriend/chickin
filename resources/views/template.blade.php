@@ -112,11 +112,12 @@
                                     class="tombol px-3 py-2 text-md font-bold hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353]  text-[#a01800] {{ request()->routeIs('chat') ? 'pb-2 border-b-4 border-[#b25353] text-[#a01800] shadow-2xl' : 'text-[#a01800]' }}">
                                     Pesan
                                 </a>
-                                <a href="{{ route('pesanan') }}"
-                                    class="tombol px-3 py-2 text-md font-bold hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353]  text-[#a01800] {{ request()->routeIs('pesanan') ? 'pb-2  border-b-4 border-[#b25353]  text-[#a01800] shadow-2xl' : 'text-[#a01800] hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353] ' }}">Pesanan</a>
-                                @if (auth()->user()->role !== 'admin')
+                                   @if (auth()->user()->role !== 'admin')
                                     <livewire:chat-notification />
                                 @endif
+                                <a href="{{ route('pesanan') }}"
+                                    class="tombol px-3 py-2 text-md font-bold hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353]  text-[#a01800] {{ request()->routeIs('pesanan') ? 'pb-2  border-b-4 border-[#b25353]  text-[#a01800] shadow-2xl' : 'text-[#a01800] hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353] ' }}">Pesanan</a>
+                             
                             @endauth
 
 

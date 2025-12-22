@@ -20,21 +20,15 @@ class AdminController extends Controller
             ->where('status', 'Diterima')
             ->sum('total_bayar');
 
-        // =====================
-        // TOTAL PENJUALAN
-        // =====================
+
         $totalPenjualan = DB::table('transaksi')->count();
 
-        // =====================
-        // PESANAN HARI INI (JUMLAH)
-        // =====================
+ 
         $pesananHariIni = DB::table('transaksi')
             ->whereDate('tanggal', Carbon::today())
             ->count();
 
-        // =====================
-        // TABEL PESANAN HARI INI
-        // =====================
+ 
         $listPesananHariIni = DB::table('transaksi')
             ->whereDate('tanggal', Carbon::today())
             ->select(
@@ -45,9 +39,7 @@ class AdminController extends Controller
             ->orderBy('kode_transaksi', 'desc')
             ->get();
 
-        // =====================
-        // PRODUK TERLARIS (TOP 4)
-        // =====================
+   
         $produkTerlaris = DB::table('detail_transaksi')
             ->join('product', 'detail_transaksi.kode_product', '=', 'product.kode_product')
             ->select(
@@ -59,9 +51,6 @@ class AdminController extends Controller
             ->limit(4)
             ->get();
 
-        // =====================
-        // GRAFIK PENJUALAN PER BULAN (TAHUN INI)
-        // =====================
         $penjualanBulanan = DB::table('transaksi')
             ->select(
                 DB::raw('MONTH(tanggal) as bulan'),
@@ -73,7 +62,7 @@ class AdminController extends Controller
             ->orderBy(DB::raw('MONTH(tanggal)'))
             ->get();
 
-        // Format untuk Chart.js
+//grafik penjualan bulanan
         $bulan = [];
         $totalBulanan = [];
 
@@ -236,9 +225,7 @@ public function exportExcel(Request $request)
             'transaksi.status'
         );
 
-    // =====================
-    // FILTER RANGE TANGGAL
-    // =====================
+  
     if (
         $request->filter === 'range' &&
         $request->filled('tanggal_awal') &&
@@ -250,18 +237,14 @@ public function exportExcel(Request $request)
         ]);
     }
 
-    // =====================
-    // FILTER BULANAN
-    // =====================
+
     if ($request->filter === 'bulanan' && $request->filled('bulan')) {
         $bulan = Carbon::parse($request->bulan);
         $query->whereMonth('transaksi.tanggal', $bulan->month)
               ->whereYear('transaksi.tanggal', $bulan->year);
     }
 
-    // =====================
-    // FILTER TAHUNAN
-    // =====================
+
     if ($request->filter === 'tahunan' && $request->filled('tahun')) {
         $query->whereYear('transaksi.tanggal', $request->tahun);
     }

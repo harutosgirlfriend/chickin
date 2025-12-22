@@ -41,6 +41,11 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
 Route::get('/admin/pesanan/export-excel', 
     [AdminController::class, 'exportExcel']
 )->name('admin.pesanan.exportExcel');
+Route::delete('/product/gambar/{id}', [ProductController::class, 'deleteGambar'])
+    ->name('product.gambar.delete');
+
+Route::put('/product/gambar/main/{id}', [ProductController::class, 'setMainGambar'])
+    ->name('product.gambar.main');
 
 });
 

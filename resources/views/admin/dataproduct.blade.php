@@ -68,13 +68,20 @@
                             </tr>
                         </thead>
 
-                        <tbody  id="productTable"  class="bg-white divide-y divide-gray-200">
+                        <tbody id="productTable" class="bg-white divide-y divide-gray-200">
 
 
                             @foreach ($products as $product)
                                 <tr>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-indigo-600 font-medium w-16"><img
-                                            src=" {{ asset('images/product/' . $product->gambar) }}" alt=""></td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-indigo-600 font-medium w-16">
+                                        @if ($product->productgambar->isNotEmpty())
+                                            <img src="{{ asset('images/product/' . $product->productgambar->where('main_gambar', 1)->first()->gambar) }}"
+                                                class="w-16 h-16 object-cover rounded">
+                                        @else
+                                            <span class="text-gray-400 text-xs">No Image</span>
+                                        @endif
+                                    </td>
+
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $product->kode_product }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -86,30 +93,18 @@
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->harga }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                                         <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-purple-100 text-purple-800">
                                             <button class="text-indigo-600 hover:text-indigo-900 flex p-2" title="Edit"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#modalEditProduct{{ $product->kode_product }}">
-                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg>
                                                 Edit
                                             </button>
                                         </span>
                                         <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                                            <button class="text-blue-600 hover:text-blue-900 flex p-2" title="Detail"
-                                                data-bs-toggle="modal"
+                                            class="inline-flex items-center px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
+                                            <button title="Detail" data-bs-toggle="modal"
                                                 data-bs-target="#modalDetailProduct{{ $product->kode_product }}">
-                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg> Detail
+                                                Detail
                                             </button>
                                         </span>
                                     </td>
@@ -201,9 +196,10 @@
                                                                 rows="4" required>{{ $product->deskripsi }}</textarea>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label>Ganti Gambar (jika perlu)</label>
-                                                            <input type="file" name="gambar[]" class="form-control" multiple>
-                                                        
+                                                            <label>Tambahkan Gambar </label>
+                                                            <input type="file" name="gambar[]" class="form-control"
+                                                                multiple>
+
                                                         </div>
                                                     </fieldset>
                                                     <div class="modal-footer">
@@ -212,6 +208,54 @@
                                                         <button type="submit" class="btn btn-primary">Update</button>
                                                     </div>
                                                 </form>
+                                                <div class="mb-4">
+                                                    <label class="font-semibold">Gambar Produk</label>
+
+                                                    <div class="grid grid-cols-3 gap-3 mt-2">
+                                                        @foreach ($product->productgambar as $img)
+                                                            <div class="relative border rounded-lg p-1">
+                                                                <img src="{{ asset('images/product/' . $img->gambar) }}"
+                                                                    class="w-full h-28 object-cover rounded">
+
+                                                                {{-- TANDA GAMBAR UTAMA --}}
+                                                                @if ($img->main_gambar)
+                                                                    <span
+                                                                        class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                                                                        Main
+                                                                    </span>
+                                                                @endif
+
+                                                                @if ($img->main_gambar == 0)
+                                                                    <form
+                                                                        action="{{ route('product.gambar.delete', $img->id) }}"
+                                                                        method="POST"
+                                                                        onsubmit="return confirm('Hapus gambar ini?')"
+                                                                        class="absolute top-1 right-1">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button
+                                                                            class="bg-red-600 text-white px-2 rounded text-xs">✕</button>
+                                                                    </form>
+                                                                @endif
+
+                                                                @if (!$img->main_gambar)
+                                                                    <form
+                                                                        action="{{ route('product.gambar.main', $img->id) }}"
+                                                                        method="POST" class="absolute bottom-1 right-1">
+                                                                        <input type="hidden" name="kode_product"
+                                                                            value="{{ $product->kode_product }}">
+                                                                        @csrf
+                                                                        @method('PUT')
+                                                                        <button
+                                                                            class="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                                                            Jadikan Utama
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -262,7 +306,7 @@
 
                                     <div class="mb-2">
                                         <label>Gambar</label>
-                                           <input type="file" name="gambar[]" class="form-control" multiple>
+                                        <input type="file" name="gambar[]" class="form-control" multiple>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -280,15 +324,14 @@
         </div>
     </div>
     <script>
-document.getElementById('liveSearch').addEventListener('keyup', function () {
-    let keyword = this.value.toLowerCase();
-    let rows = document.querySelectorAll('#productTable tr');
+        document.getElementById('liveSearch').addEventListener('keyup', function() {
+            let keyword = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#productTable tr');
 
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(keyword) ? '' : 'none';
-    });
-});
-</script>
-
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(keyword) ? '' : 'none';
+            });
+        });
+    </script>
 @endsection

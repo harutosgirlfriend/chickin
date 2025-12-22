@@ -74,21 +74,48 @@
                         <li class="sidebar-item ">
                             <a class="sidebar-link" href="{{ route('admin.pesanan') }}">
                                 <span><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-    viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round"
-        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
-</svg>
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+                                    </svg>
 
                                 </span>
                                 <span class="hide-menu">Data Penjualan</span>
                             </a>
                         </li>
                         <li class="sidebar-item ">
+                            <a class="sidebar-link" href="{{ route('admin.vouchers.index') }}">
+                                <span><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path
+                                            d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8z" />
+                                    </svg>
+
+
+                                </span>
+                                <span class="hide-menu">Data Voucher</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a class="sidebar-link" href="{{ route('admin.chat') }}">
+                                <span> <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8 10h8M8 14h5M21 12c0 4.418-4.03 8-9 8a9.98 9.98 0 01-4.39-1.02L3 22v-8c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+
+                                </span>
+
+                                <span class="hide-menu">Chat</span>
+                                <livewire:chat-notification />
+                            </a>
+                        </li>
+                        {{-- <li class="sidebar-item ">
                             <a class="sidebar-link" href="/admin/penghasilan">
                                 <span><iconify-icon icon="mdi:currency-usd" class="fs-6"></iconify-icon></span>
                                 <span class="hide-menu">Penghasilan</span>
                             </a>
-                        </li>
+                        </li> --}}
 
 
 

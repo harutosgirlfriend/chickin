@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 
 class VouchersController extends Controller
 {
-    public function index()
+    public function index(Request $request )
     {
-        $vouchers = Vouchers::all();
+        $query = Vouchers::query();
+      
+
+    if ($request->start_date && $request->end_date) {
+        $query->whereDate('mulai_berlaku', '>=', $request->start_date)
+              ->whereDate('kadaluarsa_pada', '<=', $request->end_date);
+    }
+
+    $vouchers = $query->get();
         return view('admin.vouchers.index', compact('vouchers'));
     }
 

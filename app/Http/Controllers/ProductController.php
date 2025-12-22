@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductGambar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 use function Laravel\Prompts\alert;
 
@@ -16,20 +17,19 @@ class ProductController extends Controller
 
     public function index()
     {
-    $product = Product::with('feedback')->get();
+        $product = Product::with('feedback')->get();
 
         return view('costumer.product', ['product' => $product]);
     }
 
-public function detail($kode_product)
-{
+    public function detail($kode_product)
+    {
 
-  
-    $product = Product::with(['productgambar', 'feedback.user'])->where('kode_product',$kode_product)->firstOrFail();
-    // dd($product);
-    return view('costumer.detail', ['product' => $product]);
-}
+        $product = Product::with(['productgambar', 'feedback.user'])->where('kode_product', $kode_product)->firstOrFail();
 
+        // dd($product);
+        return view('costumer.detail', ['product' => $product]);
+    }
 
     public function kategori($kategori)
     {
@@ -69,10 +69,9 @@ public function detail($kode_product)
 
     public function dataProduct()
     {
-        $product = Product::all();
+        $products = Product::with('productgambar')->get();
 
-        return view('admin.dataproduct', ['products' => $product]);
-
+        return view('admin.dataproduct', compact('products'));
     }
 
     public function simpan(Request $request)
@@ -81,10 +80,8 @@ public function detail($kode_product)
 
         $namaGambar = null;
 
-  
-
         $kode_product = $this->kode_product();
-       $product= Product::create([
+        $product = Product::create([
             'kode_product' => $kode_product,
             'nama_product' => $request->nama_product,
             'harga' => $request->harga,
@@ -95,56 +92,72 @@ public function detail($kode_product)
 
         ]);
 
-       if ($request->hasFile('gambar')) {
+        if ($request->hasFile('gambar')) {
 
-        foreach ($request->file('gambar') as $index => $file) {
+            foreach ($request->file('gambar') as $index => $file) {
 
-            $namaGambar = $file->hashName();
-            $file->move(public_path('images/product'), $namaGambar);
+                $namaGambar = $file->hashName();
+                $file->move(public_path('images/product'), $namaGambar);
 
-            ProductGambar::create([
-                'kode_product' => $kode_product,
-                'gambar'       => $namaGambar,
-                'main_gambar'  => $index == 0 ? 1 : 0, // gambar pertama = utama
-            ]);
-
-            // Set gambar utama ke tabel products
-            if ($index == 0) {
-                $product->update([
-                    'gambar' => $namaGambar
+                ProductGambar::create([
+                    'kode_product' => $kode_product,
+                    'gambar' => $namaGambar,
+                    'main_gambar' => $index == 0 ? 1 : 0, // gambar pertama = utama
                 ]);
+
+                // Set gambar utama ke tabel products
+                if ($index == 0) {
+                    $product->update([
+                        'gambar' => $namaGambar,
+                    ]);
+                }
             }
         }
-    }
+
         return redirect()->back();
     }
 
     public function update(Request $request)
     {
 
-        // dd($request);
-        $namaGambar = null;
+        $request->validate([
+            'kode_product' => 'required',
+            'nama_product' => 'required',
+            'harga' => 'required|numeric',
+            'stok' => 'required|numeric',
+            'kategori' => 'required',
+            'deskripsi' => 'required',
+            'gambar.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
 
-        //  dd($request->file('gambar'));
+        $product = Product::where('kode_product', $request->kode_product)->firstOrFail();
+
+        $product->update([
+            'nama_product' => $request->nama_product,
+            'harga' => $request->harga,
+            'stok' => $request->stok,
+            'kategori' => $request->kategori,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
         if ($request->hasFile('gambar')) {
-            $namaGambar = $request->file('gambar')->hashName();
-            $request->file('gambar')->move(public_path('images/product'), $namaGambar);
-            Product::where('kode_product', $request->kode_product)
-                ->update(['gambar' => $namaGambar]);
+
+            foreach ($request->file('gambar') as $file) {
+
+                $namaFile = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('images/product'), $namaFile);
+
+                ProductGambar::create([
+                    'kode_product' => $request->kode_product,
+                    'gambar' => $namaFile,
+                    'main_gambar' => 0,
+                ]);
+            }
         }
 
-        Product::where('kode_product', $request->kode_product)
-            ->update([
-                'nama_product' => $request->nama_product,
-                'harga' => $request->harga,
-                'stok' => $request->stok,
-                'deskripsi' => $request->deskripsi,
-                'kategori' => $request->kategori,
-            ]);
-
-        // dd($request);
-        return redirect()->back()->with('success', 'Product berhasil diupdate.');
-    
+         return redirect()
+            ->route('data.product') 
+            ->with('success', 'Data product berhasil diupdate');
     }
 
     private function kode_product()
@@ -162,5 +175,35 @@ public function detail($kode_product)
 
         return $nextId;
 
+    }
+
+    public function deleteGambar($id)
+    {
+        $gambar = ProductGambar::findOrFail($id);
+
+        $path = public_path('images/product/'.$gambar->gambar);
+        if (File::exists($path)) {
+            File::delete($path);
+        }
+
+        $kodeProduct = $gambar->kode_product; 
+        $gambar->delete();
+
+        return redirect()
+            ->route('data.product') 
+            ->with('success', 'Gambar berhasil dihapus');
+    }
+
+    public function setMainGambar($id)
+    {
+        $gambar = ProductGambar::findOrFail($id);
+        $product = Product::where('kode_product', $gambar->kode_product)->first();
+        $product->update(['gambar' => $gambar->gambar]);
+        ProductGambar::where('kode_product', $gambar->kode_product)
+            ->update(['main_gambar' => 0]);
+
+        $gambar->update(['main_gambar' => 1]);
+
+        return redirect()->back()->with('success', 'Gambar utama berhasil diubah');
     }
 }

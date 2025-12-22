@@ -18,7 +18,8 @@ class ChatModel extends Model
         'pesan',
         'created_at',
         'updated_at',
-        'dibaca'
+        'dibaca',
+        'gambar'
 
     ];
     public function pengirim()
