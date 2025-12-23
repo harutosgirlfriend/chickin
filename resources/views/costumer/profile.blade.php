@@ -25,7 +25,7 @@
 
                         {{-- LABEL GANTI BUTTON --}}
                         <label for="photoInput1"
-                            class="absolute bottom-1 right-1 z-10 bg-orange-500 p-2 rounded-full
+                            class="absolute bottom-1 right-1 z-10 bg-[#b25353] p-2 rounded-full
            text-white shadow-lg hover:bg-orange-600 cursor-pointer">
                             ✏️
                         </label>
@@ -40,7 +40,7 @@
                     <a href="{{ route('costumer.profile') }}"
                         class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition cursor-pointer
    {{ request()->routeIs('costumer.profile')
-       ? 'bg-orange-100 text-orange-700 font-semibold'
+       ? 'bg-[#b25353] text-white font-semibold'
        : 'text-gray-200 hover:bg-gray-50' }}">
                         <span class="text-lg">👤</span> Data akun
                     </a>
@@ -122,14 +122,14 @@
                         <div class="space-y-1">
                             <label class="text-xs font-semibold text-gray-400">No Hp</label>
                             <input type="text" value="{{ $users->no_hp }}" name="no_hp"
-                                class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500">
+                                class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#b25353]">
                         </div>
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-4 pt-6">
 
                         <button type="submit"
-                            class="flex-1 px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 shadow-lg shadow-orange-200 transition">simpan</button>
+                         class=" bg-[#b25353] w-full text-white font-bold rounded-xl hover:bg-[#b25353] shadow-lg shadow-orange-200  px-6 py-2 transition duration-200">simpan</button>
                     </div>
                 </form>
             </div>
@@ -156,8 +156,8 @@
 
                     <button type="button" onclick="document.getElementById('photoInput').click()"
                         class="h-12 flex items-center justify-center gap-2
-                       bg-orange-500 text-white rounded-xl font-semibold
-                       hover:bg-orange-600 transition p-2">
+                       bg-[#b25353] text-white rounded-xl font-semibold
+                       hover:bg-[#b25353] transition p-2">
                         ✏️edit
                     </button>
                 </form>
@@ -167,8 +167,8 @@
                         @method('DELETE')
                         <button onclick="return confirm('Hapus foto profile?')"
                             class="h-12 flex items-center justify-center gap-2
-                       bg-red-500 text-white rounded-xl font-semibold
-                       hover:bg-red-600 transition p-2">
+                       bg-[#b25353] text-white rounded-xl font-semibold
+                       hover:bg-[#b25353] transition p-2">
                             🗑️hapus
                         </button>
                     </form>

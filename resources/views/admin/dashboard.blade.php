@@ -3,7 +3,7 @@
 @section('content')
 <div class="space-y-8">
 
-    {{-- ================= CARD RINGKASAN ================= --}}
+
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
         <div class="bg-white p-6 rounded-xl shadow">
@@ -41,13 +41,11 @@
 
     </div>
 
-    {{-- ================= GRAFIK PENJUALAN ================= --}}
     <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-lg font-semibold mb-4">Grafik Penjualan Per Bulan</h3>
         <canvas id="penjualanChart" height="100"></canvas>
     </div>
 
-    {{-- ================= TABEL PESANAN HARI INI ================= --}}
     <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-lg font-semibold mb-4">Pesanan Hari Ini</h3>
 
@@ -100,7 +98,7 @@
 
 </div>
 
-{{-- ================= CHART.JS ================= --}}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('penjualanChart');

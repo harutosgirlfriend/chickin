@@ -30,7 +30,7 @@
                     <a href="{{ route('costumer.profile.changePassword') }}"
                         class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition cursor-pointer
    {{ request()->routeIs('costumer.profile.changePassword')
-       ? 'bg-orange-300 text-orange-700 font-semibold'
+       ? 'bg-[#b25353] text-white font-semibold'
        : 'text-gray-500 hover:bg-gray-50' }}">
                         <span class="text-lg">🔒</span> Login & Password
                     </a>
@@ -89,7 +89,7 @@
                             <i class="fas fa-times mr-2"></i>Batal
                         </a>
                         <button type="submit"
-                            class=" bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 shadow-lg shadow-orange-200  px-6 py-2 transition duration-200">
+                            class=" bg-[#b25353] text-white font-bold rounded-xl hover:bg-[#b25353] shadow-lg shadow-orange-200  px-6 py-2 transition duration-200">
                             <i class="fas fa-save mr-2"></i>Simpan
                         </button>
                     </div>

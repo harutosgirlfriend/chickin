@@ -30,7 +30,6 @@ class VouchersController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_voucher' => 'required|unique:vouchers,kode_voucher',
             'nilai_diskon' => 'required|integer',
             'min_belanja' => 'required|numeric',
             'mulai_berlaku' => 'required|date',

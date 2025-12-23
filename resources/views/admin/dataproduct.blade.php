@@ -186,9 +186,26 @@
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label">Kategori</label>
-                                                            <input type="text" name="kategori" class="form-control"
-                                                                value="{{ $product->kategori }}" required>
+
+                                                            <select name="kategori" class="form-control">
+
+                                                                <option value="ayam hidup"
+                                                                    {{ $product->kategori === 'ayam hidup' ? 'selected' : '' }}>
+                                                                    Ayam Hidup
+                                                                </option>
+                                                                <option value="ayam potong"
+                                                                    {{ $product->kategori === 'ayam potong' ? 'selected' : '' }}>
+                                                                    Ayam Potong
+                                                                </option>
+                                                                <option value="telur"
+                                                                    {{ $product->kategori === 'telur' ? 'selected' : '' }}>
+                                                                    Telur Ayam
+                                                                </option>
+
+
+                                                            </select>
                                                         </div>
+
                                                         <div class="mb-3">
                                                             <label class="form-label">Deskripsi</label>
                                                             <textarea name="deskripsi"
@@ -299,10 +316,25 @@
                                             class="form-control resize-y w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                                             rows="4" required></textarea>
                                     </div>
-                                    <div class="mb-2">
-                                        <label>Kategori</label>
-                                        <input type="text" name="kategori" class="form-control" required>
+                                    <div class="mb-3">
+                                        <label class="form-label">Kategori</label>
+
+                                        <select name="kategori" class="form-control">
+
+                                            <option value="ayam hidup">
+                                                Ayam Hidup
+                                            </option>
+                                            <option value="ayam potong">
+                                                Ayam Potong
+                                            </option>
+                                            <option value="telur">
+                                                Telur Ayam
+                                            </option>
+
+
+                                        </select>
                                     </div>
+
 
                                     <div class="mb-2">
                                         <label>Gambar</label>
