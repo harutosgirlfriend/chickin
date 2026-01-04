@@ -12,6 +12,9 @@
 
     <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+
 
     @vite(['resources/css/style.css', 'resources/js/app.js', 'resources/js/script.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -453,6 +456,7 @@
     {{-- <script src="{{ asset('js/script.js') }}"></script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     @livewireScripts
 

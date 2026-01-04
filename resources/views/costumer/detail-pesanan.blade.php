@@ -112,6 +112,7 @@
                     @foreach ($akun as $item)
                         <p class="font-bold text-green-600">{{ $item->users->nama }}</p>
                         <p class="text-green-600">{{ $item->kota }}</p>
+                        <p class="text-green-600">{{ $item->kecamatan }}</p>
                         <p class="text-green-600">{{ $item->alamat }}</p>
                     @endforeach
                 </div>

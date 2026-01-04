@@ -22,6 +22,7 @@ class Transaksi extends Model
         'metode_pembayaran',
         'total_bayar',
         'kota',
+        'kecamatan',
         'alamat',
         'id_user',
         'tanggal',

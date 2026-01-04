@@ -204,8 +204,8 @@
                             Rp {{ number_format($total) }}
                         </p>
 
-                        <input type="hidden" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
-                        <input type="hidden" id="ongkir" value="0" name="ongkir">
+                        <input type="text" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
+                        <input type="text" id="ongkir" value="0" name="ongkir">
                         <input type="hidden" name="id_voucher" id="voucherInput">
 
                     </div>
@@ -228,8 +228,8 @@
 
                     {{-- 10. Tombol Beli Sekarang 2 (Form Submit) --}}
 
-                    <p>Jarak ke lokasi anda: <strong id="jarak">-</strong></p>
-                    <input type="hidden" name="jarak" id="jarak_input">
+                    {{-- <p>Jarak ke lokasi anda: <strong id="jarak">-</strong></p>
+                    <input type="hidden" name="jarak" id="jarak_input"> --}}
 
                     <div class="md:col-span-2 flex justify-center items-center w-full mt-4">
                         <button class="p-3 bg-indigo-500 w-full rounded-md" type="submit" id="link">
@@ -497,138 +497,235 @@
 
         $(document).ready(function() {
 
-            const allowedKabupaten = [
+            const ORS_API_KEY =
+                "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImRmYjc4NTVlYjUwYTQyZmFhNDdkNzNmMGE2NWY1ZWM2IiwiaCI6Im11cm11cjY0In0=";
 
-                {
+            const allowedKabupaten = [{
                     id: 3375,
-                    name: "Kota Pekalongan"
+                    name: "Pekalongan",
+                    tipe: "Kota"
                 },
                 {
                     id: 3325,
-                    name: "Kabupaten Batang"
+                    name: "Batang",
+                    tipe: "Kabupaten"
                 }
             ];
 
+            const tujuanKabupaten = {
+                3375: {
+                    lat: -6.8886,
+                    lng: 109.6753
+                },
+                3325: {
+                    lat: -6.9729,
+                    lng: 109.7099
+                }
+            };
+
+            /* =====================
+               INIT SELECT2
+            ===================== */
             $('#kabupaten').select2({
-                placeholder: "Pilih Kabupaten/Kota"
+                placeholder: "Pilih Kabupaten/Kota",
+                width: '100%'
             });
+
             $('#kecamatan').select2({
-                placeholder: "Pilih Kecamatan"
+                placeholder: "Pilih Kecamatan",
+                width: '100%'
             });
+
+            /* =====================
+               ISI KABUPATEN
+               value  = NAMA (DB)
+               data-id = ID (API / ONGKIR)
+            ===================== */
+            $('#kabupaten').append('<option value=""></option>');
 
             allowedKabupaten.forEach(k => {
                 $('#kabupaten').append(
-                    `<option value="${k.name}" data-id="${k.id}">${k.name}</option>`
+                    `<option value="${k.name}" data-id="${k.id}">
+                ${k.tipe} ${k.name}
+            </option>`
                 );
             });
 
-            // =====================
-            // KABUPATEN DIPILIH
-            // =====================
+            /* =====================
+               KABUPATEN CHANGE
+            ===================== */
             $('#kabupaten').on('change', function() {
-                const kabID = $('#kabupaten option:selected').data('id');
 
-                $('#kecamatan').html('<option>Loading...</option>');
+                const kabID = $(this).find(':selected').data('id');
+
+                $('#kecamatan')
+                    .empty()
+                    .append('<option value="">Loading...</option>')
+                    .trigger('change');
 
                 if (!kabID) return;
 
                 fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${kabID}.json`)
                     .then(res => res.json())
                     .then(data => {
-                        $('#kecamatan').html('<option value="">Pilih Kecamatan</option>');
-                        data.forEach(kec => {
-                            $('#kecamatan').append(`<option>${kec.name}</option>`);
+
+                        $('#kecamatan').empty();
+
+                        let filtered = data;
+
+                        // 🔥 KHUSUS BATANG
+                        if (kabID == 3325) {
+                            const allowedBatang = ['batang', 'kandeman'];
+                            filtered = data.filter(kec =>
+                                allowedBatang.includes(kec.name.toLowerCase().trim())
+                            );
+                        }
+
+                        if (filtered.length === 0) {
+                            $('#kecamatan')
+                                .append('<option value="">Kecamatan tidak tersedia</option>')
+                                .trigger('change');
+                            return;
+                        }
+
+                        $('#kecamatan').append('<option value=""></option>');
+
+                        filtered.forEach(kec => {
+                            $('#kecamatan').append(
+                                `<option value="${kec.name}">${kec.name}</option>`
+                            );
                         });
+
+                        $('#kecamatan').trigger('change');
+                    })
+                    .catch(() => {
+                        alert('Gagal memuat kecamatan');
+                        $('#kecamatan')
+                            .empty()
+                            .append('<option value=""></option>')
+                            .trigger('change');
                     });
             });
 
-            // =====================
-            // KECAMATAN DIPILIH
-            // =====================
+            /* =====================
+               HITUNG ONGKIR
+            ===================== */
             $('#kecamatan').on('change', function() {
+
                 const kecamatan = $(this).val();
-                const kabupaten = $('#kabupaten').val();
                 if (!kecamatan) return;
 
+                // 🔥 AMBIL ID DARI data-id (BUKAN value)
+                const kabID = $('#kabupaten').find(':selected').data('id');
+                const tujuan = tujuanKabupaten[kabID];
+                if (!tujuan) return;
+
                 $('#ongkirLoading').removeClass('hidden');
-                $('#jarak').text('-');
                 $('#ongkirText').text('Menghitung...');
 
-
                 navigator.geolocation.getCurrentPosition(async pos => {
+
                     const userLat = pos.coords.latitude;
                     const userLng = pos.coords.longitude;
 
-                    const lokasi = await getKoordinat(kecamatan, kabupaten);
-                    if (!lokasi) return;
+                    const jarakKM = await hitungJarakJalan(
+                        userLng,
+                        userLat,
+                        tujuan.lng,
+                        tujuan.lat,
+                        ORS_API_KEY
+                    );
 
-                    const jarak = hitungJarak(userLat, userLng, lokasi.lat, lokasi.lng);
-                    const km = Math.ceil(jarak);
-                    const ongkir = km * 2000;
+                    if (!jarakKM) {
+                        alert('Gagal menghitung jarak');
+                        $('#ongkirLoading').addClass('hidden');
+                        return;
+                    }
 
-                    $('#jarak').text(km + ' KM');
-                    $('#jarak_input').val(km);
+                    const km = Math.ceil(jarakKM);
+                    const ongkir = km * 1000;
+
                     $('#ongkir').val(ongkir);
-                    $('#ongkirText').text('Rp ' + ongkir.toLocaleString('id-ID'));
+                    $('#ongkirText').text(
+                        'Rp ' + ongkir.toLocaleString('id-ID')
+                    );
 
                     $('#ongkirLoading').addClass('hidden');
-
                     hitungTotalAkhir();
+
+                }, () => {
+                    alert('Gagal mendapatkan lokasi pengguna');
+                    $('#ongkirLoading').addClass('hidden');
                 });
             });
         });
+        /* =====================
+                HITUNG JARAK JALAN
+                OPENROUTESERVICE
+             ===================== */
+        async function hitungJarakJalan(lon1, lat1, lon2, lat2, apiKey) {
 
-        /* =========================
-           HELPER
-        ========================= */
-        function getKoordinat(kec, kab) {
-            return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${kec}, ${kab}, Indonesia`)
-                .then(res => res.json())
-                .then(d => d[0] ? {
-                    lat: +d[0].lat,
-                    lng: +d[0].lon
-                } : null);
+            try {
+                const res = await fetch(
+                    "https://api.openrouteservice.org/v2/directions/driving-car", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": apiKey,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            coordinates: [
+                                [lon1, lat1],
+                                [lon2, lat2]
+                            ]
+                        })
+                    }
+                );
+
+                const data = await res.json();
+                if (!data.routes) return null;
+
+                // meter → KM
+                return data.routes[0].summary.distance / 1000;
+
+            } catch (e) {
+                return null;
+            }
         }
 
-        function hitungJarak(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
-
+        /* =====================
+           TOTAL AKHIR
+        ===================== */
         function hitungTotalAkhir() {
-            const subtotal = parseFloat(document.getElementById('totalHarga').value) || 0;
-            const ongkir = parseFloat(document.getElementById('ongkir').value) || 0;
 
-            const voucherSelect = document.getElementById('voucher_select');
-            const selected = voucherSelect.options[voucherSelect.selectedIndex];
+            const subtotal = parseFloat($('#totalHarga').val()) || 0;
+            const ongkir = parseFloat($('#ongkir').val()) || 0;
 
+            const selected = $('#voucher_select option:selected');
             let diskon = 0;
 
-            if (selected && selected.dataset.type) {
-                const tipe = selected.dataset.type;
-                const nilai = parseFloat(selected.dataset.value || 0);
-                const min = parseFloat(selected.dataset.min || 0);
+            if (selected.data('type')) {
+
+                const tipe = selected.data('type');
+                const nilai = parseFloat(selected.data('value')) || 0;
+                const min = parseFloat(selected.data('min')) || 0;
 
                 if (subtotal >= min) {
-                    if (tipe === 'persen') {
-                        diskon = subtotal * (nilai / 100);
-                    } else if (tipe === 'nominal') {
-                        diskon = nilai;
-                    }
+                    diskon = tipe === 'persen' ?
+                        subtotal * (nilai / 100) :
+                        nilai;
                 }
             }
 
             const total = Math.max(subtotal - diskon, 0) + ongkir;
 
-            document.getElementById('totalText').innerText =
-                'Rp ' + total.toLocaleString('id-ID');
+            $('#totalText').text(
+                'Rp ' + total.toLocaleString('id-ID')
+            );
 
             return total;
         }
+
 
         document.getElementById('voucher_select').addEventListener('change', function() {
             document.getElementById('voucherInput').value = this.value;
