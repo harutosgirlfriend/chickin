@@ -12,6 +12,7 @@ class Transaksi extends Model
 
     protected $casts = [
         'kode_transaksi' => 'string',
+         'tanggal' => 'date',
     ];
 
     public $timestamps = false;
@@ -32,6 +33,7 @@ class Transaksi extends Model
         'jumlah_potongan'
 
     ];
+
 
     public function details()
     {

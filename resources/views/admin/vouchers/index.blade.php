@@ -93,15 +93,15 @@
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $voucher->nilai_diskon }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $voucher->min_belanja }}</td>
+                                        {{ number_format($voucher->min_belanja) }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $voucher->mulai_berlaku }}</td>
+                                        {{ $voucher->mulai_berlaku->translatedFormat('d F Y H:i')}}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $voucher->kadaluarsa_pada ?? '-' }}</td>
+                                        {{ $voucher->kadaluarsa_pada->translatedFormat('d F Y H:i') ?? '-' }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $voucher->tipe_diskon }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $voucher->maks_diskon ?? '-' }}</td>
+                                        {{number_format($voucher->maks_diskon ?? '-')  }}</td>
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm">
                                         @if ($isActive)

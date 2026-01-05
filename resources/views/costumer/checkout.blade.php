@@ -204,8 +204,8 @@
                             Rp {{ number_format($total) }}
                         </p>
 
-                        <input type="text" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
-                        <input type="text" id="ongkir" value="0" name="ongkir">
+                        <input type="hidden" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
+                        <input type="hidden" id="ongkir" value="0" name="ongkir">
                         <input type="hidden" name="id_voucher" id="voucherInput">
 
                     </div>

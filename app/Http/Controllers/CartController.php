@@ -320,7 +320,7 @@ class CartController extends Controller
             $payment = $this->checkStatus($request->kode_transaksi);
 
             if ($payment->status === 'lunas') {
-                $pembayaran = $payment->payment_type;  // ← DIUBAH LAGI DISINI
+                $pembayaran = $payment->payment_channel;  // ← DIUBAH LAGI DISINI
             }
         }
         if ($request->items) {
@@ -462,43 +462,55 @@ class CartController extends Controller
         }
     }
 
-    public function checkStatus($orderId)
-    {
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = false;
+   public function checkStatus($orderId)
+{
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$isProduction = false;
 
-        try {
-            $status = Transaction::status($orderId);
+    try {
+        $status = Transaction::status($orderId);
 
-            if (is_array($status)) {
-                $status = (object) $status;
-            }
-
-        } catch (\Exception $e) {
-            \Log::warning("Midtrans Error: {$e->getMessage()} | Order ID: {$orderId}");
-
-            // ✅ RETURN OBJECT, BUKAN STRING
-            $payment = new stdClass;
-            $payment->kode_transaksi = $orderId;
-            $payment->payment_type = null;
-            $payment->status = 'belum memilih';
-
-            return $payment;
+        if (is_array($status)) {
+            $status = (object) $status;
         }
+
+    } catch (\Exception $e) {
+        \Log::warning("Midtrans Error: {$e->getMessage()} | Order ID: {$orderId}");
 
         $payment = new stdClass;
         $payment->kode_transaksi = $orderId;
-        $payment->payment_type = $status->payment_type ?? null;
-
-        // Mapping status Midtrans → status kamu
-        if (in_array($status->transaction_status ?? '', ['settlement', 'capture'])) {
-            $payment->status = 'lunas';
-        } elseif (($status->transaction_status ?? '') === 'pending') {
-            $payment->status = 'belum dibayar';
-        } else {
-            $payment->status = 'belum memilih';
-        }
+        $payment->payment_type = null;
+        $payment->payment_channel = null;
+        $payment->status = 'belum memilih';
 
         return $payment;
     }
+
+    $payment = new stdClass;
+    $payment->kode_transaksi = $orderId;
+    $payment->payment_type = $status->payment_type ?? null;
+
+    // ✅ TENTUKAN CHANNEL (WAJIB ADA)
+    if (($status->payment_type ?? null) === 'qris') {
+        $payment->payment_channel = $status->acquirer
+            ?? $status->issuer
+            ?? 'qris';
+    } else {
+        $payment->payment_channel = $status->bank
+            ?? $status->payment_type
+            ?? null;
+    }
+
+    // Mapping status
+    if (in_array($status->transaction_status ?? '', ['settlement', 'capture'])) {
+        $payment->status = 'lunas';
+    } elseif (($status->transaction_status ?? '') === 'pending') {
+        $payment->status = 'belum dibayar';
+    } else {
+        $payment->status = 'belum memilih';
+    }
+
+    return $payment;
+}
+
 }

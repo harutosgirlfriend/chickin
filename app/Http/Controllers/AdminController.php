@@ -9,6 +9,7 @@ use App\Models\Users;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Exports\PesananExport;
+use App\Exports\PenghasilanExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
@@ -268,6 +269,105 @@ public function exportExcel(Request $request)
         'laporan-penjualan.xlsx'
     );
 }
+public function penghasilan(Request $request)
+{
+    $query = Transaksi::with(['details.product'])
+        ->withCount('details as jumlah_produk')
+        ->where('status', 'Selesai');
 
+    // FILTER RANGE
+    if (
+        $request->filter === 'range' &&
+        $request->tanggal_awal &&
+        $request->tanggal_akhir
+    ) {
+        $query->whereBetween('tanggal', [
+            $request->tanggal_awal,
+            $request->tanggal_akhir
+        ]);
+    }
+
+    // FILTER BULANAN
+    if ($request->filter === 'bulanan' && $request->bulan) {
+        $bulan = Carbon::parse($request->bulan);
+        $query->whereMonth('tanggal', $bulan->month)
+              ->whereYear('tanggal', $bulan->year);
+    }
+
+    // FILTER TAHUNAN
+    if ($request->filter === 'tahunan' && $request->tahun) {
+        $query->whereYear('tanggal', $request->tahun);
+    }
+
+    // DATA TABEL
+    $pendapatan = (clone $query)
+        ->orderBy('tanggal', 'desc')
+        ->get();
+
+    // KATEGORI SALDO (PAKAI QUERY YANG SAMA)
+    $totalGopay = (clone $query)
+        ->where('metode_pembayaran', 'gopay')
+        ->sum('total_bayar');
+
+    $totalShopeePay = (clone $query)
+        ->where('metode_pembayaran', 'airpay shopee')
+        ->sum('total_bayar');
+
+    $totalTunai = (clone $query)
+        ->where('metode_pembayaran', 'COD')
+        ->sum('total_bayar');
+
+    $totalBRI = (clone $query)
+        ->where('metode_pembayaran', 'VA BRI')
+        ->sum('total_bayar');
+    $totalDana = (clone $query)
+        ->where('metode_pembayaran', 'dana')
+        ->sum('total_bayar');
+
+    return view('admin.penghasilan', compact(
+        'pendapatan',
+        'totalGopay',
+        'totalShopeePay',
+        'totalDana',
+        'totalTunai',
+        'totalBRI'
+    ));
+}
+public function exportExcelPenghasilan(Request $request)
+{
+    $query = Transaksi::with(['details.product'])
+        ->withCount('details as jumlah_produk');
+
+    // FILTER RANGE
+    if (
+        $request->filter === 'range' &&
+        $request->tanggal_awal &&
+        $request->tanggal_akhir
+    ) {
+        $query->whereBetween('tanggal', [
+            $request->tanggal_awal,
+            $request->tanggal_akhir
+        ]);
+    }
+
+    // FILTER BULANAN
+    if ($request->filter === 'bulanan' && $request->bulan) {
+        $bulan = Carbon::parse($request->bulan);
+        $query->whereMonth('tanggal', $bulan->month)
+              ->whereYear('tanggal', $bulan->year);
+    }
+
+    // FILTER TAHUNAN
+    if ($request->filter === 'tahunan' && $request->tahun) {
+        $query->whereYear('tanggal', $request->tahun);
+    }
+
+    $pendapatan = $query->orderBy('tanggal', 'desc')->get();
+
+    return Excel::download(
+        new PenghasilanExport($pendapatan),
+        'penghasilan.xlsx'
+    );
+}
 
 }

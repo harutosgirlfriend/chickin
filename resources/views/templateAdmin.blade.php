@@ -110,6 +110,23 @@
                                 <livewire:chat-notification />
                             </a>
                         </li>
+                        <li class="sidebar-item ">
+                            <a class="sidebar-link" href="{{ route('admin.penghasilan') }}">
+                                <span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-700">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v1.5H16.5a3 3 0 000 6h3.75V18A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M20.25 9H16.5a1.5 1.5 0 000 3h3.75V9z" />
+                                    </svg>
+
+
+                                </span>
+
+                                <span class="hide-menu">Penghasilan</span>
+
+                            </a>
+                        </li>
                         {{-- <li class="sidebar-item ">
                             <a class="sidebar-link" href="/admin/penghasilan">
                                 <span><iconify-icon icon="mdi:currency-usd" class="fs-6"></iconify-icon></span>

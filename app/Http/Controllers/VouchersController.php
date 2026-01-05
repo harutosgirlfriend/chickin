@@ -18,7 +18,7 @@ class VouchersController extends Controller
               ->whereDate('kadaluarsa_pada', '<=', $request->end_date);
     }
 
-    $vouchers = $query->get();
+    $vouchers = $query->latest('mulai_berlaku')->get();
         return view('admin.vouchers.index', compact('vouchers'));
     }
 

@@ -90,7 +90,7 @@
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->kategori }}
                                     </td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->harga }}</td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ number_format($product->harga) }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-purple-100 text-purple-800">

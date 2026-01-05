@@ -19,6 +19,10 @@ class Vouchers extends Model
     protected $dates = [
         'mulai_berlaku', 'kadaluarsa_pada',
     ];
+        protected $casts = [
+         'mulai_berlaku' => 'datetime',
+         'kadaluarsa_pada' => 'datetime',
+    ];
     public function scopeValid(Builder $query, float $subtotal)
     {
         return $query

@@ -4,10 +4,45 @@
     <div class="col-span-1 xl:col-span-1 md:col-span-6">
         <div class="card">
             <div class="p-4 sm:p-6 bg-white shadow-lg rounded-lg">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+                    {{-- GOPAY --}}
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <p class="text-sm text-gray-500">Total Saldo GoPay</p>
+                        <h3 class="text-2xl font-bold text-green-600">
+                            Rp {{ number_format($totalGopay) }}
+                        </h3>
+                    </div>
+
+                    {{-- SHOPEEPAY --}}
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <p class="text-sm text-gray-500">Total Saldo ShopeePay</p>
+                        <h3 class="text-2xl font-bold text-orange-500">
+                            Rp {{ number_format($totalShopeePay) }}
+                        </h3>
+                    </div>
+
+                    {{-- TUNAI --}}
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <p class="text-sm text-gray-500">Total Tunai</p>
+                        <h3 class="text-2xl font-bold text-blue-600">
+                            Rp {{ number_format($totalTunai) }}
+                        </h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <p class="text-sm text-gray-500">Total Dana</p>
+                        <h3 class="text-2xl font-bold text-blue-600">
+                            Rp {{ number_format($totalDana) }}
+                        </h3>
+                    </div>
+
+                    
+
+                </div>
 
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
-                        Data Pesanan
+                        Data Penghasilan
                     </h2>
                     <form method="GET" class="flex flex-wrap gap-3 mb-6">
 
@@ -52,10 +87,10 @@
                             Terapkan
                         </button>
 
-                        <a href="{{ route('admin.pesanan') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm">
+                        <a href="{{ route('admin.penghasilan') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm">
                             Reset
                         </a>
-                        <button type="submit" formaction="{{ route('admin.pesanan.exportExcel') }}"
+                        <button type="submit" formaction="{{ route('admin.penghasilan.exportExcel') }}"
                             class="bg-green-600 text-white px-4 py-2 rounded">
                             Cetak Excel
                         </button>
@@ -70,85 +105,70 @@
                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Transaksi
                                 </th>
                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Harga</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Bayar</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Produk
                                 </th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Harga</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Harga awal
+                                </th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Metode
+                                    Pembayaran</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Potongan
+                                </th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ongkir</th>
+                                </th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Laba Bersih
+                                </th>
+
                             </tr>
                         </thead>
 
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($pesanan as $pesan)
+                            @foreach ($pendapatan as $penghasilan)
                                 @php
-                                    $kode_transaksi = $pesan->kode_transaksi;
-                                    $daftar_produk = $product[$kode_transaksi] ?? [];
-
-                                    $status_class = match ($pesan->status) {
-                                        'Pending' => 'bg-blue-200 text-blue-800',
-                                        'Disetujui' => 'bg-indigo-200 text-indigo-800',
-                                        'Proses Pengantaran' => 'bg-yellow-200 text-yellow-800',
-                                        'Diterima' => 'bg-green-200 text-green-800',
-                                        'Ditolak' => 'bg-red-200 text-red-800',
-                                        default => 'bg-gray-200 text-gray-800',
-                                    };
-
-                                    $allowedNextStatus = [
-                                        'Pending' => ['Pending', 'Disetujui', 'Ditolak'],
-                                        'Disetujui' => ['Disetujui', 'Proses Pengantaran'],
-                                        'Proses Pengantaran' => ['Proses Pengantaran', 'Diterima'],
-                                        'Diterima' => ['Diterima'],
-                                        'Ditolak' => ['Ditolak'],
-                                    ];
+                                    $totalHargaAwal = 0;
                                 @endphp
+
+                                @foreach ($penghasilan->details as $detail)
+                                    @php
+                                        $totalHargaAwal += ($detail->product->harga_awal ?? 0) * ($detail->jumlah ?? 1);
+                                    @endphp
+                                @endforeach
 
                                 <tr>
                                     <td class="px-3 py-3 text-sm text-gray-900">
-                                        {{ $pesan->kode_transaksi }}
+                                        {{ $penghasilan->kode_transaksi }}
                                     </td>
 
                                     <td class="px-3 py-3 text-sm text-gray-900">
-                                        {{ $pesan->tanggal->translatedFormat('d F Y') }}
+                                        {{ $penghasilan->tanggal->translatedFormat('d F Y') }}
+
+                                    </td>
+                                    <td class="px-3 py-3 text-sm text-gray-900">
+                                        {{ $penghasilan->jumlah_produk }} Produk
                                     </td>
 
                                     <td class="px-3 py-3 text-sm text-gray-900">
-                                        {{ number_format($pesan->total_harga) }}
+                                        {{ number_format($penghasilan->total_harga) }}
                                     </td>
 
                                     <td class="px-3 py-3 text-sm text-gray-900">
-                                        {{ number_format($pesan->total_bayar) }}
+                                        {{ number_format($totalHargaAwal) }}
                                     </td>
-
-                                    <td class="px-3 py-3 text-sm">
-                                        <form action="{{ route('admin.pesanan.updateStatus') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="kode_transaksi"
-                                                value="{{ $pesan->kode_transaksi }}">
-
-                                            <select name="status" onchange="this.form.submit()"
-                                                class="text-xs font-semibold rounded-full px-3 py-2 cursor-pointer {{ $status_class }}">
-
-                                                @foreach ($allowedNextStatus[$pesan->status] as $status)
-                                                    <option value="{{ $status }}"
-                                                        {{ $pesan->status === $status ? 'selected' : '' }}>
-                                                        {{ $status }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                    </td>
-
                                     <td class="px-3 py-3 text-sm text-gray-900">
-                                        {{ count($daftar_produk) }} Produk
+                                        {{ $penghasilan->metode_pembayaran }}
+                                    </td>
+                                    <td class="px-3 py-3 text-sm text-gray-900">
+                                        {{ number_format($penghasilan->jumlah_potongan) }}
+                                    </td>
+                                    <td class="px-3 py-3 text-sm text-gray-900">
+                                        {{ number_format($penghasilan->ongkir) }}
+                                    </td>
+                                  
+                                    <td class="px-3 py-3 text-sm text-gray-900">
+                                        {{ number_format($penghasilan->total_harga - $totalHargaAwal - $penghasilan->jumlah_potongan) }}
                                     </td>
 
-                                    <td class="px-3 py-3 text-sm">
-                                        <a href="{{ route('admin.pesanan.detail', $pesan->kode_transaksi) }}"
-                                            class="inline-flex items-center px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
-                                            Detail
-                                        </a>
-                                    </td>
+
                                 </tr>
                             @endforeach
                         </tbody>

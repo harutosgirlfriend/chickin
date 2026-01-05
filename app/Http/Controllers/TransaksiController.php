@@ -26,6 +26,7 @@ class TransaksiController extends Controller
 
         $kode_transaksi = Transaksi::with(['users'])
             ->where('id_user', Auth::id())
+            ->latest('tanggal')
             ->get();
 
         $kode = [];
