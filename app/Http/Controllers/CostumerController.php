@@ -70,7 +70,7 @@ public function ubahPassword(Request $request)
     $request->validate(
         [
             'password_lama' => 'required',
-            'password' => 'required|min:8|confirmed|different:name|different:email',
+            'password' => 'required|min:8|confirmed|different:nama|different:email',
         ],
         [
             'password_lama.required' => 'Password lama wajib diisi',
@@ -93,7 +93,6 @@ public function ubahPassword(Request $request)
 }
 
 
-    // Update password
     $user->update([
         'password' => Hash::make($request->password),
     ]);
@@ -110,17 +109,15 @@ public function updatePhoto(Request $request)
     $user = Users::where('id', Auth::id())->first();
     $path = public_path('images/profile');
 
-    // Pastikan folder ada
+
     if (!File::exists($path)) {
         File::makeDirectory($path, 0755, true);
     }
 
-    // Hapus foto lama (jika ada & bukan default)
     if ($user->gambar && File::exists($path.'/'.$user->gambar)) {
         File::delete($path.'/'.$user->gambar);
     }
 
-    // Simpan foto baru
     $filename = uniqid('profile_') . '.' . $request->gambar->extension();
     $request->gambar->move($path, $filename);
 

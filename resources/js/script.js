@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         updateTotal();
     });
-document.addEventListener("change", function (e) {
+    document.addEventListener("change", function (e) {
         if (e.target && e.target.classList.contains("item-checkbox")) {
             updateTotal();
         }
@@ -194,7 +194,6 @@ document.addEventListener("change", function (e) {
         validasiCheckboxStok(id);
     });
 
-    // ⬇️ TAMBAHAN PENTING (biar awal load langsung sinkron)
     updateTotal();
 });
 
@@ -380,7 +379,6 @@ function validasiCheckboxStok(itemId) {
         if (status) status.hidden = true;
     }
 
-    // ⬇️ TAMBAHAN WAJIB (sinkron total & select-all)
     updateTotal();
 }
 

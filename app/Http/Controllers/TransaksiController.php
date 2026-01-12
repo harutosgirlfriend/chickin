@@ -84,27 +84,29 @@ class TransaksiController extends Controller
  }
 public function updateStatus(Request $request)
 {
+    // dd($request->all());
     $request->validate([
         'kode_transaksi' => 'required',
         'status' => 'required'
     ]);
 
     $pesanan = Transaksi::where('kode_transaksi', $request->kode_transaksi)->firstOrFail();
-
+// dd($pesanan->status);
 
     $alurStatus = [
-        'Pending' => ['Disetujui', 'Ditolak'],
+        'Pending' => ['Disetujui', 'Ditolak', 'Dibatalkan'],
         'Disetujui' => ['Proses Pengantaran'],
         'Proses Pengantaran' => ['Diterima'],
         'Diterima' => [],
-        'Ditolak' => []
+        'Ditolak' => [],
+        'Dibatalkan' => []
     ];
 
-    // cek validasi alur
+
     if (!in_array($request->status, $alurStatus[$pesanan->status])) {
         return back()->with('error', 'Perubahan status tidak valid');
     }
-
+// dd($request->status);
     $pesanan->status = $request->status;
     $pesanan->save();
 

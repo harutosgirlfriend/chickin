@@ -4,14 +4,14 @@
 
 @section('content')
 
-    {{-- Disesuaikan: mx-auto untuk menengahkan konten, dan p-5 dipertahankan --}}
+
     <div class="flex flex-col p-5 w-full mx-auto">
 
         <div class="lg:w-1/2 md:w-3/5 w-full max-w-lg p-10 shadow-xl shadow-[#e4c6ba]/70 rounded-md mx-auto">
-            {{-- Tambahkan items-center lagi di h1 dan button jika ingin konten form-nya sendiri centered --}}
+
             <h1 class="text-center text-xl font-bold mb-5">MASUKKAN DATA DIRI ANDA</h1>
             <form action="{{ route('simpan.transaksi') }}" onsubmit="return cekPembayaran(event)" id="checkoutForm">
-                <input type="text" name="kode_transaksi" value="{{ $kode_transaksi }}">
+                <input type="text" hidden name="kode_transaksi" value="{{ $kode_transaksi }}">
                 @if ($product)
                     <div class="flex items-center justify-between border-b pb-3 w-full">
                         <div class="flex items-center space-x-3 w-full">
@@ -92,10 +92,10 @@
                 @endif
 
 
-                {{-- START: PERUBAHAN LAYOUT DUA KOLOM DENGAN GRID --}}
+
                 <div class="form grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
-                    {{-- 1. Nama (Mengambil 2 kolom penuh di desktop) --}}
+
                     <div class="md:col-span-2">
                         <label for="price" class="block text-sm/6 font-medium text-gray-900">Nama</label>
                         <div class="mt-2">
@@ -110,7 +110,6 @@
                         </div>
                     </div>
 
-                    {{-- 2. Kabupaten/Kota (Kolom Kiri) --}}
                     <div>
                         <label class="block text-sm/6 font-medium text-gray-900">Kabupaten/Kota</label>
                         <div class="mt-2">
@@ -125,9 +124,8 @@
                         </div>
                     </div>
 
-                    {{-- 3. Kecamatan (Kolom Kanan) --}}
                     <div>
-                        <label class="block text-sm/6 font-medium text-gray-900">Kecamatan</label> {{-- Mengganti label agar lebih jelas --}}
+                        <label class="block text-sm/6 font-medium text-gray-900">Kecamatan</label>
                         <div class="mt-2">
                             <div class="mt-2">
                                 <select id="kecamatan" name="kecamatan"
@@ -204,7 +202,7 @@
                             Rp {{ number_format($total) }}
                         </p>
 
-                        <input type="hidden" id="totalHarga" value="{{ $total }}"> <!-- SUBTOTAL -->
+                        <input type="hidden" id="totalHarga" value="{{ $total }}">
                         <input type="hidden" id="ongkir" value="0" name="ongkir">
                         <input type="hidden" name="id_voucher" id="voucherInput">
 
@@ -226,21 +224,20 @@
                         <label for="ukuran-m">Metode Lain</label><br>
                     </label>
 
-                    {{-- 10. Tombol Beli Sekarang 2 (Form Submit) --}}
 
                     {{-- <p>Jarak ke lokasi anda: <strong id="jarak">-</strong></p>
                     <input type="hidden" name="jarak" id="jarak_input"> --}}
 
                     <div class="md:col-span-2 flex justify-center items-center w-full mt-4">
                         <button class="p-3 bg-indigo-500 w-full rounded-md" type="submit" id="link">
-                            {{-- Tambahkan w-full dan rounded-md --}}
+
                             <span class="font-semibold text-white">BELI SEKARANG</span>
-                            {{-- Mengganti teks agar membedakan --}}
+
                         </button>
                     </div>
 
                 </div>
-                {{-- END: PERUBAHAN LAYOUT DUA KOLOM DENGAN GRID --}}
+
 
             </form>
 
@@ -354,11 +351,9 @@
 
             const totalBayar = Math.max(subtotal - diskon, 0) + ongkir;
 
-            // Update tampilan
             document.getElementById('totalText').innerText =
                 'Rp ' + totalBayar.toLocaleString('id-ID');
 
-            // Kirim voucher ke backend
             document.getElementById('voucherInput').value = selected.value;
         });
 
@@ -398,7 +393,7 @@
                 return false;
             }
 
-            // 🔥 Kalau ada voucher tersedia tapi belum dipilih
+
             if (jumlahVoucher > 0 && !voucherDipilih) {
                 Swal.fire({
                     icon: 'warning',
@@ -443,7 +438,7 @@
 
                     },
                     onClose: function() {
-                        // 🔥 INI YANG WAJIB ADA
+
 
                     }
                 });
@@ -523,9 +518,7 @@
                 }
             };
 
-            /* =====================
-               INIT SELECT2
-            ===================== */
+
             $('#kabupaten').select2({
                 placeholder: "Pilih Kabupaten/Kota",
                 width: '100%'
@@ -536,11 +529,7 @@
                 width: '100%'
             });
 
-            /* =====================
-               ISI KABUPATEN
-               value  = NAMA (DB)
-               data-id = ID (API / ONGKIR)
-            ===================== */
+
             $('#kabupaten').append('<option value=""></option>');
 
             allowedKabupaten.forEach(k => {
@@ -551,9 +540,6 @@
                 );
             });
 
-            /* =====================
-               KABUPATEN CHANGE
-            ===================== */
             $('#kabupaten').on('change', function() {
 
                 const kabID = $(this).find(':selected').data('id');
@@ -573,7 +559,7 @@
 
                         let filtered = data;
 
-                        // 🔥 KHUSUS BATANG
+
                         if (kabID == 3325) {
                             const allowedBatang = ['batang', 'kandeman'];
                             filtered = data.filter(kec =>
@@ -607,95 +593,47 @@
                     });
             });
 
-            /* =====================
-               HITUNG ONGKIR
-            ===================== */
+
             $('#kecamatan').on('change', function() {
 
                 const kecamatan = $(this).val();
                 if (!kecamatan) return;
 
-                // 🔥 AMBIL ID DARI data-id (BUKAN value)
+
                 const kabID = $('#kabupaten').find(':selected').data('id');
                 const tujuan = tujuanKabupaten[kabID];
                 if (!tujuan) return;
 
                 $('#ongkirLoading').removeClass('hidden');
                 $('#ongkirText').text('Menghitung...');
+                let ongkir = 0;
+                if (kecamatan.toLowerCase().includes('batang') || kecamatan.toLowerCase().includes(
+                        'kandeman')) {
+                    ongkir = 15000;
+                } else if (kecamatan.toLowerCase().includes('pekalongan barat')) {
+                    ongkir = 13 * 1500;
+                } else if (kecamatan.toLowerCase().includes('pekalongan timur')) {
+                    ongkir = 12 * 1500;
+                } else if (kecamatan.toLowerCase().includes('pekalongan selatan')) {
+                    ongkir = 14 * 1500;
+                } else {
+                    ongkir = 14 * 1500;
+                }
 
-                navigator.geolocation.getCurrentPosition(async pos => {
 
-                    const userLat = pos.coords.latitude;
-                    const userLng = pos.coords.longitude;
-
-                    const jarakKM = await hitungJarakJalan(
-                        userLng,
-                        userLat,
-                        tujuan.lng,
-                        tujuan.lat,
-                        ORS_API_KEY
-                    );
-
-                    if (!jarakKM) {
-                        alert('Gagal menghitung jarak');
-                        $('#ongkirLoading').addClass('hidden');
-                        return;
-                    }
-
-                    const km = Math.ceil(jarakKM);
-                    const ongkir = km * 1000;
-
-                    $('#ongkir').val(ongkir);
-                    $('#ongkirText').text(
-                        'Rp ' + ongkir.toLocaleString('id-ID')
-                    );
-
-                    $('#ongkirLoading').addClass('hidden');
-                    hitungTotalAkhir();
-
-                }, () => {
-                    alert('Gagal mendapatkan lokasi pengguna');
-                    $('#ongkirLoading').addClass('hidden');
-                });
-            });
-        });
-        /* =====================
-                HITUNG JARAK JALAN
-                OPENROUTESERVICE
-             ===================== */
-        async function hitungJarakJalan(lon1, lat1, lon2, lat2, apiKey) {
-
-            try {
-                const res = await fetch(
-                    "https://api.openrouteservice.org/v2/directions/driving-car", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": apiKey,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            coordinates: [
-                                [lon1, lat1],
-                                [lon2, lat2]
-                            ]
-                        })
-                    }
+                $('#ongkir').val(ongkir);
+                $('#ongkirText').text(
+                    'Rp ' + ongkir.toLocaleString('id-ID')
                 );
 
-                const data = await res.json();
-                if (!data.routes) return null;
+                $('#ongkirLoading').addClass('hidden');
+                hitungTotalAkhir();
 
-                // meter → KM
-                return data.routes[0].summary.distance / 1000;
 
-            } catch (e) {
-                return null;
-            }
-        }
+            });
+        });
 
-        /* =====================
-           TOTAL AKHIR
-        ===================== */
+
         function hitungTotalAkhir() {
 
             const subtotal = parseFloat($('#totalHarga').val()) || 0;
@@ -743,7 +681,7 @@
 
             try {
                 const loading = document.getElementById('loading');
-                loading.classList.remove('hidden'); // tampilkan loading
+                loading.classList.remove('hidden');
 
                 const response = await fetch("/cek/transaksi", {
                     method: "POST",
@@ -756,7 +694,7 @@
 
                 const data = await response.json();
 
-                loading.classList.add('hidden'); // sembunyikan loading
+                loading.classList.add('hidden');
 
                 if (data.success) {
                     payRadio.classList.value = data.pembayaran;
@@ -771,7 +709,7 @@
                 }
 
             } catch (error) {
-                document.getElementById('loading').classList.add('hidden'); // sembunyikan loading
+                document.getElementById('loading').classList.add('hidden');
                 Swal.fire({
                     title: 'Error',
                     text: 'Terjadi kesalahan koneksi',

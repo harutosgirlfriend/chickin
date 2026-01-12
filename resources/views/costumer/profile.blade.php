@@ -10,7 +10,7 @@
             <div
                 class="w-full md:w-1/3 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col items-center">
 
-                {{-- FOTO PROFILE --}}
+  
                 <form action="{{ route('costumer.profile.updatePhoto') }}" method="POST" enctype="multipart/form-data"
                     id="photoForm1">
                     @csrf
@@ -23,7 +23,6 @@
 
                         <input type="file" name="gambar" id="photoInput1" accept="image/*" class="hidden">
 
-                        {{-- LABEL GANTI BUTTON --}}
                         <label for="photoInput1"
                             class="absolute bottom-1 right-1 z-10 bg-[#b25353] p-2 rounded-full
            text-white shadow-lg hover:bg-orange-600 cursor-pointer">
@@ -136,7 +135,7 @@
 
         </div>
     </div>
-    {{-- MODAL PREVIEW FOTO --}}
+
     <div id="photoModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
 
         <div class="relative bg-white rounded-2xl p-4 max-w-sm w-full">

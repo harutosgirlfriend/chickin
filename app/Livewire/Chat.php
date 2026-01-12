@@ -60,7 +60,7 @@ class Chat extends Component
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Tandai semua pesan dari lawan yang belum dibaca
+    
         $this->markAsRead($penerimaId);
     }
 
@@ -128,10 +128,6 @@ public function submit()
             ->update(['dibaca' => true]);
     }
 
-    /**
-     * Ambil daftar user untuk chat list, urut berdasarkan chat terbaru
-     * dan sertakan jumlah pesan belum dibaca.
-     */
     public function getChatUsers()
     {
         if (auth()->user()->role === 'admin') {

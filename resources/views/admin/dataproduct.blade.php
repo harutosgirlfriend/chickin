@@ -234,7 +234,7 @@
                                                                 <img src="{{ asset('images/product/' . $img->gambar) }}"
                                                                     class="w-full h-28 object-cover rounded">
 
-                                                                {{-- TANDA GAMBAR UTAMA --}}
+                                                   
                                                                 @if ($img->main_gambar)
                                                                     <span
                                                                         class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-1 rounded">

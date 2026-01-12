@@ -2,34 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PenghasilanExport;
+use App\Exports\PesananExport;
 use App\Models\DetailTransaksi;
 use App\Models\Tracking;
 use App\Models\Transaksi;
 use App\Models\Users;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use App\Exports\PesananExport;
-use App\Exports\PenghasilanExport;
-use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
-             $totalPendapatan = DB::table('transaksi')
-            ->where('status', 'Diterima')
+        $totalPendapatan = DB::table('transaksi')
+            ->where('status', '=', 'Diterima')
             ->sum('total_bayar');
-
 
         $totalPenjualan = DB::table('transaksi')->count();
 
- 
         $pesananHariIni = DB::table('transaksi')
             ->whereDate('tanggal', Carbon::today())
             ->count();
 
- 
         $listPesananHariIni = DB::table('transaksi')
             ->whereDate('tanggal', Carbon::today())
             ->select(
@@ -40,7 +37,6 @@ class AdminController extends Controller
             ->orderBy('kode_transaksi', 'desc')
             ->get();
 
-   
         $produkTerlaris = DB::table('detail_transaksi')
             ->join('product', 'detail_transaksi.kode_product', '=', 'product.kode_product')
             ->select(
@@ -58,12 +54,12 @@ class AdminController extends Controller
                 DB::raw('SUM(total_bayar) as total')
             )
             ->whereYear('tanggal', Carbon::now()->year)
-            ->where('status', 'Diterima')
+            ->where('status', '=', 'Diterima')
             ->groupBy(DB::raw('MONTH(tanggal)'))
             ->orderBy(DB::raw('MONTH(tanggal)'))
             ->get();
 
-//grafik penjualan bulanan
+        // grafik penjualan bulanan
         $bulan = [];
         $totalBulanan = [];
 
@@ -89,68 +85,57 @@ class AdminController extends Controller
         return view('admin.registrasiAkun');
     }
 
-public function pesanan(Request $request)
-{
-    $query = Transaksi::with(['users']);
+    public function pesanan(Request $request)
+    {
+        $query = Transaksi::with(['users']);
 
-    // =====================
-    // RENTANG TANGGAL
-    // =====================
-    if ($request->filter === 'range'
-        && $request->filled('tanggal_awal')
-        && $request->filled('tanggal_akhir')) {
+        if ($request->filter === 'range'
+            && $request->filled('tanggal_awal')
+            && $request->filled('tanggal_akhir')) {
 
-        $query->whereBetween('tanggal', [
-            $request->tanggal_awal,
-            $request->tanggal_akhir
+            $query->whereBetween('tanggal', [
+                $request->tanggal_awal,
+                $request->tanggal_akhir,
+            ]);
+        }
+
+        if ($request->filter === 'bulanan' && $request->filled('bulan')) {
+            $bulan = Carbon::parse($request->bulan);
+            $query->whereMonth('tanggal', $bulan->month)
+                ->whereYear('tanggal', $bulan->year);
+        }
+
+        if ($request->filter === 'tahunan' && $request->filled('tahun')) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
+        $pesanan = $query->orderBy('tanggal', 'desc')->get();
+
+        $detailTransaksi = DetailTransaksi::with(['transaksi', 'product'])
+            ->whereIn('kode_transaksi', $pesanan->pluck('kode_transaksi'))
+            ->get();
+
+        $produkDikelompokkan = $detailTransaksi->groupBy('kode_transaksi');
+
+        $hasilAkhir = $produkDikelompokkan->map(function ($details) {
+            return $details->map(function ($detail) {
+                return [
+                    'id_detail' => $detail->id_detail,
+                    'kode_product' => $detail->kode_product,
+                    'gambar' => $detail->product->gambar,
+                    'nama_product' => $detail->product->nama_product ?? 'Nama Produk Tidak Ditemukan',
+                    'jumlah' => $detail->jumlah,
+                    'harga_satuan' => $detail->harga,
+                    'subtotal' => $detail->subtotal,
+                ];
+            })->toArray();
+        })->toArray();
+
+        return view('admin.dataPesanan', [
+            'pesanan' => $pesanan,
+            'product' => $hasilAkhir,
         ]);
     }
-
-    // =====================
-    // BULANAN
-    // =====================
-    if ($request->filter === 'bulanan' && $request->filled('bulan')) {
-        $bulan = Carbon::parse($request->bulan);
-        $query->whereMonth('tanggal', $bulan->month)
-              ->whereYear('tanggal', $bulan->year);
-    }
-
-    // =====================
-    // TAHUNAN
-    // =====================
-    if ($request->filter === 'tahunan' && $request->filled('tahun')) {
-        $query->whereYear('tanggal', $request->tahun);
-    }
-
-    $pesanan = $query->orderBy('tanggal', 'desc')->get();
-
-    // DETAIL TRANSAKSI (IKUT FILTER)
-    $detailTransaksi = DetailTransaksi::with(['transaksi', 'product'])
-        ->whereIn('kode_transaksi', $pesanan->pluck('kode_transaksi'))
-        ->get();
-
-    $produkDikelompokkan = $detailTransaksi->groupBy('kode_transaksi');
-
-    $hasilAkhir = $produkDikelompokkan->map(function ($details) {
-        return $details->map(function ($detail) {
-            return [
-                'id_detail' => $detail->id_detail,
-                'kode_product' => $detail->kode_product,
-                'gambar' => $detail->product->gambar,
-                'nama_product' => $detail->product->nama_product ?? 'Nama Produk Tidak Ditemukan',
-                'jumlah' => $detail->jumlah,
-                'harga_satuan' => $detail->harga,
-                'subtotal' => $detail->subtotal,
-            ];
-        })->toArray();
-    })->toArray();
-
-    return view('admin.dataPesanan', [
-        'pesanan' => $pesanan,
-        'product' => $hasilAkhir
-    ]);
-}
-
 
     public function detailPesanan($kode_transaksi)
     {
@@ -172,10 +157,12 @@ public function pesanan(Request $request)
 
         return view('admin.detailPesanan', ['pesanan' => $pesanan, 'products' => $detailTransaksi, 'tracking' => $tracking, 'status' => $pesanan['status'], 'akun' => $akun]);
     }
+
     public function chat()
     {
         return view('admin.chat');
     }
+
     public function managementUser()
     {
         $users = Users::where('role', 'customer')
@@ -184,31 +171,33 @@ public function pesanan(Request $request)
         return view('admin.managementUser', ['users' => $users]);
 
     }
+
     public function updateStatus(Request $request)
-{
-    $request->validate([
-        'id_user' => 'required|exists:users,id',
-        'status' => 'required|in:active,non active'
-    ]);
+    {
+        $request->validate([
+            'id_user' => 'required|exists:users,id',
+            'status' => 'required|in:active,non active',
+        ]);
 
-    Users::where('id', $request->id_user)
-        ->update(['status' => $request->status]);
+        Users::where('id', $request->id_user)
+            ->update(['status' => $request->status]);
 
-    return back()->with('success', 'Status user berhasil diupdate');
-}
-public function exportExcel(Request $request)
-{
-    DB::statement("SET SESSION group_concat_max_len = 10000");
+        return back()->with('success', 'Status user berhasil diupdate');
+    }
 
-    $query = DB::table('transaksi')
-        ->leftJoin('detail_transaksi', 'transaksi.kode_transaksi', '=', 'detail_transaksi.kode_transaksi')
-        ->leftJoin('product', 'detail_transaksi.kode_product', '=', 'product.kode_product')
-        ->select(
-            'transaksi.kode_transaksi',
-            'transaksi.tanggal',
+    public function exportExcel(Request $request)
+    {
+        DB::statement('SET SESSION group_concat_max_len = 10000');
 
-            // GABUNG PRODUK
-            DB::raw("
+        $query = DB::table('transaksi')
+            ->leftJoin('detail_transaksi', 'transaksi.kode_transaksi', '=', 'detail_transaksi.kode_transaksi')
+            ->leftJoin('product', 'detail_transaksi.kode_product', '=', 'product.kode_product')
+            ->select(
+                'transaksi.kode_transaksi',
+                'transaksi.tanggal',
+
+                // GABUNG PRODUK
+                DB::raw("
                 GROUP_CONCAT(
                     CONCAT(
                         product.nama_product,
@@ -218,156 +207,149 @@ public function exportExcel(Request $request)
                 ) as produk
             "),
 
-            'transaksi.total_harga',
-            'transaksi.ongkir',
-            'transaksi.jumlah_potongan',
-            'transaksi.total_bayar',
-            'transaksi.metode_pembayaran',
-            'transaksi.status'
+                'transaksi.total_harga',
+                'transaksi.ongkir',
+                'transaksi.jumlah_potongan',
+                'transaksi.total_bayar',
+                'transaksi.metode_pembayaran',
+                'transaksi.status'
+            );
+
+        if (
+            $request->filter === 'range' &&
+            $request->filled('tanggal_awal') &&
+            $request->filled('tanggal_akhir')
+        ) {
+            $query->whereBetween('transaksi.tanggal', [
+                $request->tanggal_awal,
+                $request->tanggal_akhir,
+            ]);
+        }
+
+        if ($request->filter === 'bulanan' && $request->filled('bulan')) {
+            $bulan = Carbon::parse($request->bulan);
+            $query->whereMonth('transaksi.tanggal', $bulan->month)
+                ->whereYear('transaksi.tanggal', $bulan->year);
+        }
+
+        if ($request->filter === 'tahunan' && $request->filled('tahun')) {
+            $query->whereYear('transaksi.tanggal', $request->tahun);
+        }
+
+        $data = $query
+            ->groupBy(
+                'transaksi.kode_transaksi',
+                'transaksi.tanggal',
+                'transaksi.total_harga',
+                'transaksi.ongkir',
+                'transaksi.jumlah_potongan',
+                'transaksi.total_bayar',
+                'transaksi.metode_pembayaran',
+                'transaksi.status'
+            )
+            ->orderBy('transaksi.tanggal', 'desc')
+            ->get();
+
+        return Excel::download(
+            new PesananExport($data),
+            'laporan-penjualan.xlsx'
         );
+    }
 
-  
-    if (
-        $request->filter === 'range' &&
-        $request->filled('tanggal_awal') &&
-        $request->filled('tanggal_akhir')
-    ) {
-        $query->whereBetween('transaksi.tanggal', [
-            $request->tanggal_awal,
+    public function penghasilan(Request $request)
+    {
+        $query = Transaksi::with(['details.product'])
+            ->withCount('details as jumlah_produk')
+            ->where('status', '=', 'Diterima');
+          
+
+
+        if (
+            $request->filter === 'range' &&
+            $request->tanggal_awal &&
             $request->tanggal_akhir
-        ]);
+        ) {
+            $query->whereBetween('tanggal', [
+                $request->tanggal_awal,
+                $request->tanggal_akhir,
+            ]);
+        }
+
+        if ($request->filter === 'bulanan' && $request->bulan) {
+            $bulan = Carbon::parse($request->bulan);
+            $query->whereMonth('tanggal', $bulan->month)
+                ->whereYear('tanggal', $bulan->year);
+        }
+
+        if ($request->filter === 'tahunan' && $request->tahun) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
+        $pendapatan = (clone $query)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        $totalGopay = (clone $query)
+            ->where('metode_pembayaran', 'gopay')
+            ->sum('total_bayar');
+
+        $totalShopeePay = (clone $query)
+            ->where('metode_pembayaran', 'airpay shopee')
+            ->sum('total_bayar');
+
+        $totalTunai = (clone $query)
+            ->where('metode_pembayaran', 'COD')
+            ->sum('total_bayar');
+
+        $totalBRI = (clone $query)
+            ->where('metode_pembayaran', 'VA BRI')
+            ->sum('total_bayar');
+        $totalDana = (clone $query)
+            ->where('metode_pembayaran', 'dana')
+            ->sum('total_bayar');
+
+        return view('admin.penghasilan', compact(
+            'pendapatan',
+            'totalGopay',
+            'totalShopeePay',
+            'totalDana',
+            'totalTunai',
+            'totalBRI'
+        ));
     }
 
+    public function exportExcelPenghasilan(Request $request)
+    {
+        $query = Transaksi::with(['details.product'])
+            ->withCount('details as jumlah_produk')
+            ->where('status', '=', 'Diterima');
 
-    if ($request->filter === 'bulanan' && $request->filled('bulan')) {
-        $bulan = Carbon::parse($request->bulan);
-        $query->whereMonth('transaksi.tanggal', $bulan->month)
-              ->whereYear('transaksi.tanggal', $bulan->year);
-    }
-
-
-    if ($request->filter === 'tahunan' && $request->filled('tahun')) {
-        $query->whereYear('transaksi.tanggal', $request->tahun);
-    }
-
-    $data = $query
-        ->groupBy(
-            'transaksi.kode_transaksi',
-            'transaksi.tanggal',
-            'transaksi.total_harga',
-            'transaksi.ongkir',
-            'transaksi.jumlah_potongan',
-            'transaksi.total_bayar',
-            'transaksi.metode_pembayaran',
-            'transaksi.status'
-        )
-        ->orderBy('transaksi.tanggal', 'desc')
-        ->get();
-
-    return Excel::download(
-        new PesananExport($data),
-        'laporan-penjualan.xlsx'
-    );
-}
-public function penghasilan(Request $request)
-{
-    $query = Transaksi::with(['details.product'])
-        ->withCount('details as jumlah_produk')
-        ->where('status', 'Selesai');
-
-    // FILTER RANGE
-    if (
-        $request->filter === 'range' &&
-        $request->tanggal_awal &&
-        $request->tanggal_akhir
-    ) {
-        $query->whereBetween('tanggal', [
-            $request->tanggal_awal,
+        if (
+            $request->filter === 'range' &&
+            $request->tanggal_awal &&
             $request->tanggal_akhir
-        ]);
+        ) {
+            $query->whereBetween('tanggal', [
+                $request->tanggal_awal,
+                $request->tanggal_akhir,
+            ]);
+        }
+
+        if ($request->filter === 'bulanan' && $request->bulan) {
+            $bulan = Carbon::parse($request->bulan);
+            $query->whereMonth('tanggal', $bulan->month)
+                ->whereYear('tanggal', $bulan->year);
+        }
+
+        if ($request->filter === 'tahunan' && $request->tahun) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
+        $pendapatan = $query->orderBy('tanggal', 'desc')->get();
+
+        return Excel::download(
+            new PenghasilanExport($pendapatan),
+            'penghasilan.xlsx'
+        );
     }
-
-    // FILTER BULANAN
-    if ($request->filter === 'bulanan' && $request->bulan) {
-        $bulan = Carbon::parse($request->bulan);
-        $query->whereMonth('tanggal', $bulan->month)
-              ->whereYear('tanggal', $bulan->year);
-    }
-
-    // FILTER TAHUNAN
-    if ($request->filter === 'tahunan' && $request->tahun) {
-        $query->whereYear('tanggal', $request->tahun);
-    }
-
-    // DATA TABEL
-    $pendapatan = (clone $query)
-        ->orderBy('tanggal', 'desc')
-        ->get();
-
-    // KATEGORI SALDO (PAKAI QUERY YANG SAMA)
-    $totalGopay = (clone $query)
-        ->where('metode_pembayaran', 'gopay')
-        ->sum('total_bayar');
-
-    $totalShopeePay = (clone $query)
-        ->where('metode_pembayaran', 'airpay shopee')
-        ->sum('total_bayar');
-
-    $totalTunai = (clone $query)
-        ->where('metode_pembayaran', 'COD')
-        ->sum('total_bayar');
-
-    $totalBRI = (clone $query)
-        ->where('metode_pembayaran', 'VA BRI')
-        ->sum('total_bayar');
-    $totalDana = (clone $query)
-        ->where('metode_pembayaran', 'dana')
-        ->sum('total_bayar');
-
-    return view('admin.penghasilan', compact(
-        'pendapatan',
-        'totalGopay',
-        'totalShopeePay',
-        'totalDana',
-        'totalTunai',
-        'totalBRI'
-    ));
-}
-public function exportExcelPenghasilan(Request $request)
-{
-    $query = Transaksi::with(['details.product'])
-        ->withCount('details as jumlah_produk');
-
-    // FILTER RANGE
-    if (
-        $request->filter === 'range' &&
-        $request->tanggal_awal &&
-        $request->tanggal_akhir
-    ) {
-        $query->whereBetween('tanggal', [
-            $request->tanggal_awal,
-            $request->tanggal_akhir
-        ]);
-    }
-
-    // FILTER BULANAN
-    if ($request->filter === 'bulanan' && $request->bulan) {
-        $bulan = Carbon::parse($request->bulan);
-        $query->whereMonth('tanggal', $bulan->month)
-              ->whereYear('tanggal', $bulan->year);
-    }
-
-    // FILTER TAHUNAN
-    if ($request->filter === 'tahunan' && $request->tahun) {
-        $query->whereYear('tanggal', $request->tahun);
-    }
-
-    $pendapatan = $query->orderBy('tanggal', 'desc')->get();
-
-    return Excel::download(
-        new PenghasilanExport($pendapatan),
-        'penghasilan.xlsx'
-    );
-}
-
 }

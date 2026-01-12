@@ -24,7 +24,7 @@ class HomeController extends Controller
             [
                 'email' => 'unique:users,email',
                 'nama' => 'string',
-                'password' => 'min:8|confirmed',
+                'password' => 'min:8|confirmed|different:nama|different:email',
                 'no_hp' => 'numeric|digits_between:12,13',
             ],
             [
@@ -34,6 +34,7 @@ class HomeController extends Controller
                 'password.confirm' => 'Konfirmasi Kata sandi tidak cocok',
                 'no_hp.numeric' => 'harus berisi nomor',
                 'no_hp.digits_between' => 'Nomor HP harus berisi antara 12 sampai 13 angka.',
+                'password.different' => 'Kata sandi tidak boleh sama dengan nama dan email',
 
             ]);
 
@@ -43,8 +44,8 @@ class HomeController extends Controller
             'password' => Hash::make($request->password),
             'no_hp' => $request->no_hp,
             'role' => 'customer',
-            'created_at'=> Carbon::now(),
-            'updated_at'=> Carbon::now(),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
 
         return view('admin.login');
@@ -60,11 +61,11 @@ class HomeController extends Controller
 
             return back()->withErrors(['email' => 'Email tidak terdaftar.']);
         }
-         if ($user->status === 'Non Active') {
-        return back()->withErrors([
-            'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.'
-        ]);
-    }
+        if ($user->status === 'Non Active') {
+            return back()->withErrors([
+                'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.',
+            ]);
+        }
 
         if (Auth::attempt($credentials)) {
 

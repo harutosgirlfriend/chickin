@@ -44,7 +44,7 @@
                                 class="py-3 px-4 block w-full border-gray-200 rounded-sm text-sm focus:border-blue-600 focus:ring-0 "
                                 aria-describedby="hs-input-helper-text" name="password">
                         </div>
-                        <!-- checkbox -->
+              
                         <div class="flex justify-between">
                             {{-- <div class="flex"> --}}
                             {{-- <input type="checkbox"

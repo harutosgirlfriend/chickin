@@ -202,7 +202,7 @@
 
         </div>
     </div> --}}
-    <h1 class="text-4xl font-bold text-[#a01800] mb-10 top-pro text-center">Product Kami</h1>
+    <h1 class="text-4xl font-bold text-[#a01800] mb-10 top-pro text-center mt-5">Product Kami</h1>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-stretch p-10 ">
 
         @foreach ($product as $p)
@@ -251,7 +251,7 @@
     <footer class="bg-[#e4c6ba] text-[#5a1a0c] mt-20 shadow-xl shadow-[#e4c6ba]/70 rounded-md">
         <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {{-- Brand --}}
+         
             <div>
                 <h2 class="text-2xl font-bold text-[#a01800] mb-2">CHICKin</h2>
                 <p class="text-sm leading-relaxed">
@@ -260,7 +260,7 @@
                 </p>
             </div>
 
-            {{-- Lokasi --}}
+    
             <div>
                 <h3 class="text-lg font-semibold text-[#a01800] mb-3">Lokasi Toko</h3>
                 <p class="text-sm mb-3">
@@ -270,7 +270,6 @@
                 <a href="https://maps.app.goo.gl/7uvj2ud7V2YfKDRLA?g_st=aw" target="_blank"
                     class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-[#b25353] px-4 py-2 rounded-md shadow-lg hover:bg-[#a01800] transition">
 
-                    {{-- Icon Maps --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path
                             d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" />
@@ -280,11 +279,11 @@
                 </a>
             </div>
 
-            {{-- Social Media --}}
+  
             <div>
                 <h3 class="text-lg font-semibold text-[#a01800] mb-3">Ikuti Kami</h3>
                 <div class="flex gap-4">
-                    <!-- Instagram -->
+       
                     <a href="https://www.instagram.com/USERNAME_KAMU" target="_blank"
                         class="text-white hover:text-[#f0e9e9] transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
@@ -295,7 +294,6 @@
                         </svg>
                     </a>
 
-                    <!-- Twitter -->
                     <a href="https://twitter.com/USERNAME_KAMU" target="_blank"
                         class="text-white hover:text-[#f0e9e9] transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -310,7 +308,7 @@
         </div>
 
         <div class="bg-[#b25353] text-white text-center text-sm py-3 shadow-inner">
-            © {{ date('Y') }} CHICKin. All rights reserved.
+            © {{ date('Y') }} CHICKin.
         </div>
     </footer>
 

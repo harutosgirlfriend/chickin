@@ -6,7 +6,7 @@
             <div class="p-4 sm:p-6 bg-white shadow-lg rounded-lg">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
-                    {{-- GOPAY --}}
+  
                     <div class="bg-white p-4 rounded-lg shadow">
                         <p class="text-sm text-gray-500">Total Saldo GoPay</p>
                         <h3 class="text-2xl font-bold text-green-600">
@@ -14,7 +14,7 @@
                         </h3>
                     </div>
 
-                    {{-- SHOPEEPAY --}}
+    
                     <div class="bg-white p-4 rounded-lg shadow">
                         <p class="text-sm text-gray-500">Total Saldo ShopeePay</p>
                         <h3 class="text-2xl font-bold text-orange-500">
@@ -22,7 +22,6 @@
                         </h3>
                     </div>
 
-                    {{-- TUNAI --}}
                     <div class="bg-white p-4 rounded-lg shadow">
                         <p class="text-sm text-gray-500">Total Tunai</p>
                         <h3 class="text-2xl font-bold text-blue-600">
@@ -40,17 +39,17 @@
 
                 </div>
 
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-6 mt-5">
                     <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
                         Data Penghasilan
                     </h2>
                     <form method="GET" class="flex flex-wrap gap-3 mb-6">
 
-                        {{-- MODE FILTER --}}
+    
                         <select name="filter" id="filterMode" class="border rounded px-3 py-2 text-sm"
                             onchange="toggleFilter()">
 
-                            <option value="">-- Pilih Filter --</option>
+                            <option value="">Pilih Filter</option>
                             <option value="range" {{ request('filter') == 'range' ? 'selected' : '' }}>
                                 Rentang Tanggal
                             </option>
@@ -62,7 +61,7 @@
                             </option>
                         </select>
 
-                        {{-- RENTANG TANGGAL --}}
+       
                         <div id="range" class="flex gap-2">
                             <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}"
                                 class="border rounded px-3 py-2 text-sm">
@@ -71,13 +70,13 @@
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-                        {{-- BULANAN --}}
+   
                         <div id="bulanan">
                             <input type="month" name="bulan" value="{{ request('bulan') }}"
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-                        {{-- TAHUNAN --}}
+ 
                         <div id="tahunan">
                             <input type="number" name="tahun" value="{{ request('tahun') }}" placeholder="Tahun"
                                 class="border rounded px-3 py-2 text-sm w-28">
@@ -193,7 +192,7 @@
                 mode === 'tahunan' ? 'block' : 'none';
         }
 
-        // auto run saat reload
+
         toggleFilter();
     </script>
 @endsection

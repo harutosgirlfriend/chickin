@@ -85,6 +85,7 @@
                 @foreach ($akun as $item)
                     <p class="font-bold text-green-600">{{ $item->users->nama }}</p>
                     <p class="font-semibold text-green-600">{{ $item->kota }}</p>
+                    <p class="font-semibold text-green-600">{{ $item->users->no_hp }}</p>
                     <p class="font-semibold text-green-600">{{ $item->alamat }}</p>
                 @endforeach
             </div>
@@ -118,6 +119,10 @@
                 <div class="flex justify-between">
                     <span>Ongkir</span>
                     <span>Rp{{ number_format($pesanan->ongkir) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Potongan</span>
+                    <span>Rp{{ number_format($pesanan->jumlah_potongan) }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Metode Pembayaran</span>

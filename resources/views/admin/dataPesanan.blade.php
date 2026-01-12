@@ -11,11 +11,11 @@
                     </h2>
                     <form method="GET" class="flex flex-wrap gap-3 mb-6">
 
-                        {{-- MODE FILTER --}}
+     
                         <select name="filter" id="filterMode" class="border rounded px-3 py-2 text-sm"
                             onchange="toggleFilter()">
 
-                            <option value="">-- Pilih Filter --</option>
+                            <option value="">Pilih Filter</option>
                             <option value="range" {{ request('filter') == 'range' ? 'selected' : '' }}>
                                 Rentang Tanggal
                             </option>
@@ -27,7 +27,6 @@
                             </option>
                         </select>
 
-                        {{-- RENTANG TANGGAL --}}
                         <div id="range" class="flex gap-2">
                             <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}"
                                 class="border rounded px-3 py-2 text-sm">
@@ -36,13 +35,13 @@
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-                        {{-- BULANAN --}}
+        
                         <div id="bulanan">
                             <input type="month" name="bulan" value="{{ request('bulan') }}"
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-                        {{-- TAHUNAN --}}
+             
                         <div id="tahunan">
                             <input type="number" name="tahun" value="{{ request('tahun') }}" placeholder="Tahun"
                                 class="border rounded px-3 py-2 text-sm w-28">
@@ -91,6 +90,7 @@
                                         'Proses Pengantaran' => 'bg-yellow-200 text-yellow-800',
                                         'Diterima' => 'bg-green-200 text-green-800',
                                         'Ditolak' => 'bg-red-200 text-red-800',
+                                        'Dibatalkan' => 'bg-red-200 text-red-800',
                                         default => 'bg-gray-200 text-gray-800',
                                     };
 
@@ -100,6 +100,7 @@
                                         'Proses Pengantaran' => ['Proses Pengantaran', 'Diterima'],
                                         'Diterima' => ['Diterima'],
                                         'Ditolak' => ['Ditolak'],
+                                        'Dibatalkan' => ['Dibatalkan'],
                                     ];
                                 @endphp
 
@@ -173,7 +174,7 @@
                 mode === 'tahunan' ? 'block' : 'none';
         }
 
-        // auto run saat reload
+
         toggleFilter();
     </script>
 @endsection

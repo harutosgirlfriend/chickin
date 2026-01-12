@@ -33,13 +33,10 @@ class CartController extends Controller
     public function ambilMidtrans($params)
     {
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
         \Midtrans\Config::$isProduction = false;
-        // Set sanitization on (default)
         \Midtrans\Config::$isSanitized = true;
-        // Set 3DS transaction for credit card to true
         \Midtrans\Config::$is3ds = true;
-        // dd($snapToken);
+ 
 
         return \Midtrans\Snap::getSnapToken($params);
     }
@@ -222,7 +219,6 @@ class CartController extends Controller
 
         $item_details = [];
 
-        // ITEM PRODUK
         if ($request->filled('items')) {
             foreach ($request->items as $item) {
                 $item_details[] = [
@@ -245,7 +241,6 @@ class CartController extends Controller
         $ongkir = $request->ongkir ?? 0;
         $diskon = 0;
 
-        // HITUNG DISKON
         if ($request->id_voucher) {
             $voucher = Vouchers::where('kode_voucher', $request->id_voucher)->first();
 
@@ -261,7 +256,7 @@ class CartController extends Controller
             }
         }
 
-        // ONGKIR
+   
         $item_details[] = [
             'id' => 'SHIPPING',
             'price' => $ongkir,
@@ -269,7 +264,7 @@ class CartController extends Controller
             'name' => 'Ongkos Kirim',
         ];
 
-        // 🔥 DISKON SEBAGAI ITEM NEGATIF (WAJIB)
+     
         if ($diskon > 0) {
             $item_details[] = [
                 'id' => 'DISCOUNT',
@@ -279,7 +274,7 @@ class CartController extends Controller
             ];
         }
 
-        // TOTAL = JUMLAH ITEM DETAILS
+
         $grossAmount = collect($item_details)->sum(fn ($i) => $i['price'] * $i['quantity']);
 
         $params = [
@@ -364,7 +359,7 @@ class CartController extends Controller
         Tracking::create([
             'kode_transaksi' => $request->kode_transaksi,
             'status' => 'Pending',
-            // 'jam'=>date('Y-m-d '),
+  
         ]);
         // dd($request->items);
         if ($request->items) {
@@ -490,7 +485,6 @@ class CartController extends Controller
     $payment->kode_transaksi = $orderId;
     $payment->payment_type = $status->payment_type ?? null;
 
-    // ✅ TENTUKAN CHANNEL (WAJIB ADA)
     if (($status->payment_type ?? null) === 'qris') {
         $payment->payment_channel = $status->acquirer
             ?? $status->issuer
@@ -501,7 +495,7 @@ class CartController extends Controller
             ?? null;
     }
 
-    // Mapping status
+
     if (in_array($status->transaction_status ?? '', ['settlement', 'capture'])) {
         $payment->status = 'lunas';
     } elseif (($status->transaction_status ?? '') === 'pending') {

@@ -23,11 +23,11 @@ class ChatNotification extends Component
             $this->selectedUser = $this->user->first();
         } else {
             $this->selectedUser = Users::find(4); // admin
-            // Jangan otomatis mark as read di mount, nanti hilang badge saat refresh
+ 
         }
     }
 
-    // Hitung jumlah pesan yang belum dibaca
+
     public function loadUnread()
     {
         $this->unreadCount = ChatModel::where('id_penerima', Auth::id())
@@ -35,7 +35,6 @@ class ChatNotification extends Component
             ->count();
     }
 
-    // Tandai pesan dari pengirim tertentu sebagai sudah dibaca
     public function markAsRead($pengirimId)
     {
         ChatModel::where('id_pengirim', $pengirimId)
@@ -43,7 +42,7 @@ class ChatNotification extends Component
             ->where('dibaca', false)
             ->update(['dibaca' => true]);
 
-        $this->loadUnread(); // update badge
+        $this->loadUnread(); 
     }
 
     public function render()

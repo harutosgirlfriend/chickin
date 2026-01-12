@@ -30,10 +30,9 @@
         </div>
     </div>
 
-    <!-- Chat window -->
+ 
     <div id="chat-window" class="w-1/2 flex flex-col bg-white">
 
-        <!-- Header chat -->
         <div class="p-4 border-b border-gray-200 flex items-center gap-2">
             <div
                 class="w-12 h-12 flex items-center justify-center rounded-full bg-[#a01800] text-white text-lg font-semibold">
@@ -42,7 +41,7 @@
             <p class="font-semibold text-lg">{{ $selectedUser->nama ?? 'Admin' }}</p>
         </div>
 
-        <!-- Messages -->
+
         <div wire:poll.2s="loadMessages" class="flex-grow p-6 overflow-y-auto space-y-4 bg-gray-50">
             @foreach ($messages as $message)
                 <div class="flex {{ $message->id_pengirim == auth()->id() ? 'justify-end' : 'justify-start' }}">
@@ -63,7 +62,6 @@
             @endforeach
         </div>
 
-        <!-- Input chat -->
         <div class="p-4 border-t border-gray-200 bg-white">
             <form wire:submit.prevent="submit" class="flex items-center gap-2 p-4 max-w-4xl mx-auto">
                 <input wire:model.defer="newMessage" type="text" placeholder="Ketik pesan..."

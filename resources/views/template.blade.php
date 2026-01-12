@@ -12,7 +12,7 @@
 
     <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 
 
@@ -29,6 +29,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        * {
+            font-family: "Montserrat", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+        }
+
         @media (max-width: 600px) {
             .hero-section {
                 height: 600px;
@@ -83,7 +89,7 @@
         <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             <div class="relative flex h-16 items-center justify-between">
                 <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                    <!-- Mobile menu button-->
+
                     <button type="button" command="--toggle" commandfor="mobile-menu"
                         class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500 menu">
                         <span class="absolute -inset-0.5"></span>
@@ -115,12 +121,12 @@
                                     class="tombol px-3 py-2 text-md font-bold hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353]  text-[#a01800] {{ request()->routeIs('chat') ? 'pb-2 border-b-4 border-[#b25353] text-[#a01800] shadow-2xl' : 'text-[#a01800]' }}">
                                     Pesan
                                 </a>
-                                   @if (auth()->user()->role !== 'admin')
+                                @if (auth()->user()->role !== 'admin')
                                     <livewire:chat-notification />
                                 @endif
                                 <a href="{{ route('pesanan') }}"
                                     class="tombol px-3 py-2 text-md font-bold hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353]  text-[#a01800] {{ request()->routeIs('pesanan') ? 'pb-2  border-b-4 border-[#b25353]  text-[#a01800] shadow-2xl' : 'text-[#a01800] hover:pb-2 hover:text-[#b25353] hover:border-b-4 hover:border-[#b25353] ' }}">Pesanan</a>
-                             
+
                             @endauth
 
 
@@ -211,10 +217,10 @@
                     @endauth
                     @guest
                         <a href="{{ route('login.view') }}"
-                            class="text-[#b25353] px-6 py-3 block font-bold justify-self-center rounded-md shadow-xl shadow-[#e4c6ba]/50 hover:text-[#b25353] hover:bg-[#f0e9e9]">Login</a>
+                            class="text-[#b25353] px-6 py-3 block font-bold justify-self-center shadow-[#e4c6ba]/50 hover:text-[#b25353] hover:bg-[#f0e9e9] hover:rounded-md">Login</a>
 
                     @endguest
-                    <!-- Profile dropdown -->
+
 
                 </div>
             </div>

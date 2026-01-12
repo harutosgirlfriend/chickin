@@ -11,10 +11,8 @@
             <div class="relative">
                 <div x-data="{ currentImage: '{{ asset('images/product/' . $product->gambar) }}' }">
 
-                    {{-- GAMBAR UTAMA --}}
                     <img :src="currentImage" class="w-full max-w-md h-96 object-cover rounded-lg shadow-md mx-auto">
 
-                    {{-- THUMBNAILS --}}
                     <div class="flex gap-2 mt-3">
                         @foreach ($product->productgambar as $gmbr)
                             <img src="{{ asset('images/product/' . $gmbr->gambar) }}"

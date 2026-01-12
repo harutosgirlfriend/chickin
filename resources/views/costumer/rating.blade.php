@@ -28,7 +28,7 @@
                         method="POST">
                         @csrf
 
-                        {{-- STAR RATING --}}
+         
                         <div class="flex gap-1 star-rating">
                             @for ($i = 1; $i <= 5; $i++)
                                 <label class="cursor-pointer">

@@ -14,6 +14,8 @@
             'Disetujui' => 'text-indigo-600',
             'Proses Pengantaran' => 'text-yellow-600',
             'Diterima' => 'text-green-600',
+            'Dibatalkan' => 'text-red-600',
+            'Ditolak' => 'text-red-600',
         ];
 
         $statusBg = [
@@ -21,6 +23,8 @@
             'Disetujui' => 'bg-indigo-600 border-indigo-600',
             'Proses Pengantaran' => 'bg-yellow-600 border-yellow-600',
             'Diterima' => 'bg-green-600 border-green-600',
+            'Dibatalkan' => 'bg-red-600 border-red-600',
+            'Ditolak' => 'bg-red-600 border-red-600',
         ];
 
         $nextStatus = match ($currentStatus) {
@@ -80,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="mt-auto flex justify-center">
+            <div class="mt-auto flex justify-center  gap-4">
                 @if ($currentStatus === 'Proses Pengantaran')
                     <form action="{{ route('admin.pesanan.updateStatus') }}" method="POST">
                         @csrf
@@ -96,6 +100,14 @@
                         Beri Penilaian
                     </a>
                 @elseif($nextStatus)
+                    <form action="{{ route('admin.pesanan.updateStatus') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="kode_transaksi" value="{{ $pesanan->kode_transaksi }}">
+                        <input type="hidden" name="status" value="Dibatalkan">
+                        <button class="w-96 p-3 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                            Batalkan Pesanan
+                        </button>
+                    </form>
                     <a onclick="history.back()" class="w-96 p-3 bg-gray-400 text-white text-center rounded">
                         Kembali
                     </a>
@@ -143,6 +155,9 @@
                             Harga</span><span>Rp{{ number_format($pesanan->total_harga) }}</span></div>
                     <div class="flex justify-between">
                         <span>Ongkir</span><span>Rp{{ number_format($pesanan->ongkir) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Potongan</span><span>Rp{{ number_format($pesanan->jumlah_potongan) }}</span>
                     </div>
                     <div class="flex justify-between"><span>Metode</span><span>{{ $pesanan->metode_pembayaran }}</span>
                     </div>

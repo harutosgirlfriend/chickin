@@ -102,10 +102,9 @@ class ProductController extends Controller
                 ProductGambar::create([
                     'kode_product' => $kode_product,
                     'gambar' => $namaGambar,
-                    'main_gambar' => $index == 0 ? 1 : 0, // gambar pertama = utama
+                    'main_gambar' => $index == 0 ? 1 : 0,
                 ]);
 
-                // Set gambar utama ke tabel products
                 if ($index == 0) {
                     $product->update([
                         'gambar' => $namaGambar,
