@@ -106,7 +106,7 @@
                     <p class="text-gray-500">Belum ada ulasan untuk produk ini.</p>
                 @else
                     @foreach ($product->feedback as $fb)
-                        <div class=" py-2">
+                        <div class="py-2 border-b border-gray-200 mb-2">
                             <div class="flex items-center gap-1 mb-1">
                                 @for ($i = 1; $i <= 5; $i++)
                                     <svg class="w-4 h-4 {{ $i <= $fb->rating ? 'text-yellow-400' : 'text-gray-300' }}"
@@ -117,9 +117,20 @@
                                 @endfor
                                 <span class="text-sm text-gray-500 ml-1">{{ $fb->user->nama ?? 'Anonim' }}</span>
                             </div>
-                            <p class="text-gray-700 text-sm">{{ $fb->comment }}</p>
+                            <p class="text-gray-700 text-sm mb-1">{{ $fb->comment }}</p>
+
+                                @if ($fb->photos->isNotEmpty())
+                                    <div class="flex gap-2 mt-1 flex-wrap">
+                                        @foreach ($fb->photos as $foto)
+                                            <img src="{{ asset('storage/' . $foto->foto) }}" alt="Foto Feedback"
+                                                class="w-24 h-24 object-cover rounded-md">
+                                        @endforeach
+                                    </div>
+                                @endif
+                          
                         </div>
                     @endforeach
+
                 @endif
             </div>
 

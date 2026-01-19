@@ -13,7 +13,8 @@
 
 <div class="kop">
     <h2>CHICKin</h2>
-    <p>Laporan Stok Produk</p>
+    <p>Sistem Manajemen Stok</p>
+    <p>Email: admin@chickin.com | Telp: 08xxxxxxxx</p>
 </div>
 
 <p style="text-align:right">

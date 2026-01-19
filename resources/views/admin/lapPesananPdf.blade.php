@@ -17,7 +17,7 @@
 
     <div class="kop">
         <h2>CHICKin</h2>
-        <h4>Sistem Manajemen User</h4>
+        <h4>Sistem Manajemen Penjualan</h4>
         <p>Email: admin@chickin.com | Telp: 08xxxxxxxx</p>
 
         <h3>LAPORAN PESANAN</h3>

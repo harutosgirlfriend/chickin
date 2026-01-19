@@ -11,11 +11,11 @@
                 <div class="flex gap-2 mb-4">
                     <a href="{{ route('admin.user.export.excel') }}"
                         class="bg-green-600 text-white px-4 py-2 rounded text-sm">
-                        Export Excel
+                        Cetak Excel
                     </a>
 
                     <a href="{{ route('admin.user.export.pdf') }}" class="bg-red-600 text-white px-4 py-2 rounded text-sm">
-                        Export PDF
+                        Cetak PDF
                     </a>
                 </div>
             </div>

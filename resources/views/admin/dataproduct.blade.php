@@ -28,12 +28,12 @@
                         <div class="flex space-x-3">
                             <a href="{{ route('product.export.excel') }}"
                                 class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700">
-                                Export Stok Excel
+                                Cetak Excel
                             </a>
 
                             <a href="{{ route('product.export.pdf') }}"
                                 class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
-                                Export Stok PDF
+                                Cetak PDF
                             </a>
 
                             <button data-bs-toggle="modal" data-bs-target="#modalTambahProduct"
@@ -69,6 +69,10 @@
                                 </th>
                                 <th scope="col"
                                     class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-900">
+                                    Minimal Stok<span class="ml-1 text-gray-400">↑</span>
+                                </th>
+                                <th scope="col"
+                                    class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-900">
                                     Kategori
                                 </th>
                                 <th scope="col"
@@ -100,7 +104,19 @@
                                         {{ $product->kode_product }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $product->nama_product }}</td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">{{ $product->stok }}</td>
+                    
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
+                                        @if ($product->stok <= $product->minimal_stok)
+                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">
+                                                {{ $product->stok }} Kurang
+                                            </span>
+                                        @else
+                                            {{ $product->stok }}
+                                        @endif
+                                    </td>
+
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
+                                        {{ $product->minimal_stok }}</td>
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->kategori }}
                                     </td>
@@ -151,6 +167,7 @@
                                                         <p><strong>Nama Product:</strong> {{ $product->kode_product }}</p>
                                                         <p><strong>Harga:</strong> {{ $product->harga }}</p>
                                                         <p><strong>Stok:</strong> {{ $product->stok }}</p>
+                                                        <p><strong>Minimal Stok:</strong> {{ $product->minimal_stok }}</p>
                                                         <p><strong>Kategori:</strong> {{ $product->kategori }}</p>
                                                     </div>
                                                 </div>
@@ -193,6 +210,12 @@
                                                             <label class="form-label">Stok</label>
                                                             <input type="text" name="stok" class="form-control"
                                                                 value="{{ $product->stok }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Minimal Stok</label>
+                                                            <input type="text" name="minimal_stok"
+                                                                class="form-control" value="{{ $product->minimal_stok }}"
+                                                                required>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label">Harga</label>
@@ -320,6 +343,10 @@
                                     <div class="mb-2">
                                         <label>Stok</label>
                                         <input type="number" name="stok" class="form-control" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Minimal Stok</label>
+                                        <input type="number" name="minimal_stok" class="form-control" required>
                                     </div>
                                     <div class="mb-2">
                                         <label>Harga</label>

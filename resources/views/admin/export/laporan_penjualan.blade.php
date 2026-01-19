@@ -5,11 +5,9 @@
             <th colspan="9" style="font-size:16pt; font-weight:bold; text-align:center;">CHICKin</th>
         </tr>
         <tr>
-            <th colspan="9" style="font-size:12pt; text-align:center;">Sistem Manajemen User</th>
+            <th colspan="9" style="font-size:12pt; text-align:center;">Laporan Penjualan</th>
         </tr>
-        <tr>
-            <th colspan="9" style="font-size:12pt; text-align:center;">Email: admin@chickin.com | Telp: 08xxxxxxxx</th>
-        </tr>
+       
         <tr>
             <th colspan="9" style="font-size:12pt; text-align:center;">
                 @if(request()->filter == 'range' && request()->filled('tanggal_awal') && request()->filled('tanggal_akhir'))

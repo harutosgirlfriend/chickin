@@ -24,11 +24,11 @@
                 @if ($alreadyRated)
                     <p class="text-green-600">✔ Sudah diberi penilaian</p>
                 @else
-                    <form action="{{ route('product.rate', [$item->kode_transaksi, $item->product->kode_product]) }}"
-                        method="POST">
+                    <form enctype="multipart/form-data"
+                        action="{{ route('product.rate', [$item->kode_transaksi, $item->product->kode_product]) }}"
+                        method="POST" enctype="multipart/form-data">
                         @csrf
 
-         
                         <div class="flex gap-1 star-rating">
                             @for ($i = 1; $i <= 5; $i++)
                                 <label class="cursor-pointer">
@@ -41,12 +41,21 @@
                                 </label>
                             @endfor
                         </div>
-
+                        @error('rating')
+                            <p class="text-red-500 text-sm-mt-1">{{ $message }}</p>
+                        @enderror
                         <textarea name="komentar" class="w-full border rounded p-2 mt-2" placeholder="Tulis ulasan..."></textarea>
-
-                        <button class="bg-yellow-500 px-4 py-2 mt-3 text-white rounded">
-                            Kirim Rating
-                        </button>
+                        @error('komentar')
+                            <p class="text-red-500 text-sm-mt-1">{{ $message }}</p>
+                        @enderror
+                        <label class="block mt-2">
+                            Upload Foto (opsional):
+                            <input type="file" name="foto[]" class="border p-2 rounded w-full" multiple>
+                        </label>
+                        @error('foto.*')
+                            <p class="text-red-500 text-sm-mt-1">{{ $message }}</p>
+                        @enderror
+                        <button class="bg-yellow-500 px-4 py-2 mt-3 text-white rounded">Kirim Rating</button>
                     </form>
                 @endif
             </div>
