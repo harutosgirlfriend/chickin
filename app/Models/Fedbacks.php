@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperFedbacks
+ */
 class Fedbacks extends Model
 {
         protected $table = 'product_feedbacks';

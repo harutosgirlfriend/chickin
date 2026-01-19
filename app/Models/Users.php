@@ -5,11 +5,19 @@ namespace App\Models;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
+
+
 
 // BARIS INI DIPERBAIKI: Anda harus mengimplementasikan Authenticatable
+/**
+ * @mixin IdeHelperUsers
+ */
 class Users extends Model implements Authenticatable
 {
     use AuthenticatableTrait;
+    use CanResetPasswordTrait;
 
     protected $table = 'users';
 

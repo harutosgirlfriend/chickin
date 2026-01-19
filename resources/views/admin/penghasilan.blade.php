@@ -6,7 +6,7 @@
             <div class="p-4 sm:p-6 bg-white shadow-lg rounded-lg">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
-  
+
                     <div class="bg-white p-4 rounded-lg shadow">
                         <p class="text-sm text-gray-500">Total Saldo GoPay</p>
                         <h3 class="text-2xl font-bold text-green-600">
@@ -14,7 +14,7 @@
                         </h3>
                     </div>
 
-    
+
                     <div class="bg-white p-4 rounded-lg shadow">
                         <p class="text-sm text-gray-500">Total Saldo ShopeePay</p>
                         <h3 class="text-2xl font-bold text-orange-500">
@@ -35,7 +35,7 @@
                         </h3>
                     </div>
 
-                    
+
 
                 </div>
 
@@ -45,7 +45,7 @@
                     </h2>
                     <form method="GET" class="flex flex-wrap gap-3 mb-6">
 
-    
+
                         <select name="filter" id="filterMode" class="border rounded px-3 py-2 text-sm"
                             onchange="toggleFilter()">
 
@@ -61,7 +61,7 @@
                             </option>
                         </select>
 
-       
+
                         <div id="range" class="flex gap-2">
                             <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}"
                                 class="border rounded px-3 py-2 text-sm">
@@ -70,13 +70,13 @@
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-   
+
                         <div id="bulanan">
                             <input type="month" name="bulan" value="{{ request('bulan') }}"
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
- 
+
                         <div id="tahunan">
                             <input type="number" name="tahun" value="{{ request('tahun') }}" placeholder="Tahun"
                                 class="border rounded px-3 py-2 text-sm w-28">
@@ -86,13 +86,19 @@
                             Terapkan
                         </button>
 
-                        <a href="{{ route('admin.penghasilan') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm">
+                        <a href="{{ route('admin.penghasilan') }}"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm">
                             Reset
                         </a>
                         <button type="submit" formaction="{{ route('admin.penghasilan.exportExcel') }}"
                             class="bg-green-600 text-white px-4 py-2 rounded">
                             Cetak Excel
                         </button>
+                        <button type="submit" formaction="{{ route('admin.penghasilan.exportPdf') }}"
+                            class="bg-red-600 text-white px-4 py-2 rounded">
+                            Cetak PDF
+                        </button>
+
                     </form>
 
                 </div>
@@ -162,7 +168,7 @@
                                     <td class="px-3 py-3 text-sm text-gray-900">
                                         {{ number_format($penghasilan->ongkir) }}
                                     </td>
-                                  
+
                                     <td class="px-3 py-3 text-sm text-gray-900">
                                         {{ number_format($penghasilan->total_harga - $totalHargaAwal - $penghasilan->jumlah_potongan) }}
                                     </td>

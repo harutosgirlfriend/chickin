@@ -84,9 +84,10 @@
                 <h2 class="text-xl font-bold mb-2">Alamat</h2>
                 @foreach ($akun as $item)
                     <p class="font-bold text-green-600">{{ $item->users->nama }}</p>
-                    <p class="font-semibold text-green-600">{{ $item->kota }}</p>
                     <p class="font-semibold text-green-600">{{ $item->users->no_hp }}</p>
-                    <p class="font-semibold text-green-600">{{ $item->alamat }}</p>
+                    <p class="font-semibold text-green-600">{{ $item->users->email }}</p>
+                <p class="text-green-600">{{ $item->kota }}, {{ $item->kecamatan }}, {{ $item->alamat }}</p>
+      
                 @endforeach
             </div>
 

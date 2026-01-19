@@ -49,6 +49,20 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
     Route::get('/admin/penghasilan/export',
         [AdminController::class, 'exportExcelPenghasilan']
     )->name('admin.penghasilan.exportExcel');
+    Route::get('/admin/user/export/excel', [AdminController::class, 'exportUserExcel'])
+        ->name('admin.user.export.excel');
+    Route::get('/admin/user/export/pdf', [AdminController::class, 'exportUserPdf'])
+        ->name('admin.user.export.pdf');
+    Route::get('/product/export/excel', [AdminController::class, 'exportStockExcel'])
+        ->name('product.export.excel');
+
+    Route::get('/product/export/pdf', [AdminController::class, 'exportStockPdf'])
+        ->name('product.export.pdf');
+        Route::get('/admin/penghasilan/export-pdf', [AdminController::class, 'exportPdfPenghasilan'])
+    ->name('admin.penghasilan.exportPdf');
+    Route::get('/admin/pesanan/export-pdf', [AdminController::class, 'exportPdfPesanan'])
+    ->name('admin.pesanan.exportPdf');
+
 
 });
 
@@ -69,6 +83,13 @@ Route::middleware(['keranjang'])->group(function () {
     Route::get('/regis/save', [HomeController::class, 'regis'])->name('regis.save');
     Route::get('/login/view', [HomeController::class, 'loginView'])->name('login.view');
     Route::get('/login', [HomeController::class, 'login'])->name('login');
+
+    // lupa password
+    Route::get('/lupa-password', [HomeController::class, 'lupaPassword'])->name('lupa.password');
+    Route::match(['get', 'post'], '/cek/email', [HomeController::class, 'cekEmail'])->name('cek.email');
+    Route::match(['get', 'post'], '/atur/password/{token}', [HomeController::class, 'aturPassword'])->name('atur.password');
+    Route::match(['get', 'post'], '/action', [HomeController::class, 'aturPasswordAction'])->name('password.action');
+
     Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
     Route::get('/pesanan', [TransaksiController::class, 'pesanan'])->name('pesanan');
     Route::get('/pesanan/detail/{kode_transaksi}', [TransaksiController::class, 'detailPesanan'])->name('detail.pesanan');

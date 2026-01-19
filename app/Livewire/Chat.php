@@ -4,13 +4,16 @@ namespace App\Livewire;
 
 use App\Models\ChatModel;
 use App\Models\Users;
-use Livewire\WithFileUploads; 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Chat extends Component
 {
-      use WithFileUploads;
+    use WithFileUploads;
+
+    public $search = '';
+
     public $newMessage;
 
     public $user;
@@ -31,10 +34,9 @@ class Chat extends Component
     public function mount()
     {
         if (auth()->user()->role === 'admin') {
-            $this->user = Users::where('id', '!=', Auth::id())->get();
-            $this->selectedUser = $this->user->first();
+            $this->loadUsers();
         } else {
-            $this->selectedUser = Users::find(4); // admin
+            $this->selectedUser = Users::find(4);
         }
 
         $this->loginId = Auth::id();
@@ -60,37 +62,37 @@ class Chat extends Component
             ->orderBy('created_at', 'asc')
             ->get();
 
-    
         $this->markAsRead($penerimaId);
     }
 
+    public function submit()
+    {
+        if (! $this->newMessage && ! $this->photo) {
+            return;
+        }
 
-public function submit()
-{
-    if (!$this->newMessage && !$this->photo) return;
+        $penerimaId = auth()->user()->role === 'admin'
+            ? $this->selectedUser?->id
+            : 4;
 
-    $penerimaId = auth()->user()->role === 'admin'
-        ? $this->selectedUser?->id
-        : 4;
+        $gambarPath = null;
 
-    $gambarPath = null;
+        if ($this->photo) {
+            $gambarPath = $this->photo->store('chat', 'public');
+        }
 
-    if ($this->photo) {
-        $gambarPath = $this->photo->store('chat', 'public');
+        $message = ChatModel::create([
+            'id_pengirim' => Auth::id(),
+            'id_penerima' => $penerimaId,
+            'pesan' => $this->newMessage,
+            'gambar' => $gambarPath,
+            'dibaca' => false,
+        ]);
+
+        $this->messages->push($message);
+        $this->reset(['newMessage', 'photo']);
+        $this->loadMessages();
     }
-
-    $message = ChatModel::create([
-        'id_pengirim' => Auth::id(),
-        'id_penerima' => $penerimaId,
-        'pesan' => $this->newMessage,
-        'gambar' => $gambarPath,
-        'dibaca' => false
-    ]);
-
-    $this->messages->push($message);
-    $this->reset(['newMessage', 'photo']);
-    $this->loadMessages();
-}
 
     public function getListeners()
     {
@@ -164,4 +166,25 @@ public function submit()
     {
         $this->selectUser($pengirimId);
     }
+
+    public function updatedSearch()
+    {
+        $this->loadUsers();
+    }
+
+  public function loadUsers()
+{
+    $this->user = Users::where('id', '!=', Auth::id())
+        ->when($this->search, function ($q) {
+            $q->where(function ($sub) {
+                $sub->where('nama', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        })
+        ->get();
+
+    $this->selectedUser = $this->user->first();
+    $this->loadMessages();
+}
+
 }

@@ -1,8 +1,22 @@
 <div class="flex h-[90vh] chat-container max-w-7xl mx-auto shadow-xl rounded-lg overflow-hidden mt-2">
 
     <div id="contact-list" class="w-1/2 bg-white border-r border-gray-200">
-        <div class="p-4 text-lg font-semibold border-b border-gray-200">
-            Pesan
+        <div class="p-4 text-lg font-semibold border-b border-gray-200 flex items-center justify-between">
+            <span>Pesan</span>
+            @if (auth()->user()->role == 'admin')
+                <div class="flex input-group w-50 rounded-md border-2 px-2">
+                    <div class="icon flex items-center">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+
+                    <input class="form-control border-none" type="text" name="keyword"
+                        placeholder="Cari User" value="" wire:model.debounce.300ms="search">
+                </div>
+            @endif
         </div>
         <div class="overflow-y-auto h-full pb-16">
             @foreach ($this->getChatUsers() as $pengirim)
@@ -30,7 +44,7 @@
         </div>
     </div>
 
- 
+
     <div id="chat-window" class="w-1/2 flex flex-col bg-white">
 
         <div class="p-4 border-b border-gray-200 flex items-center gap-2">

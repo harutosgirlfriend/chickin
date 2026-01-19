@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperProductGambar
+ */
 class ProductGambar extends Model
 {
      protected $table = 'product_gambar';

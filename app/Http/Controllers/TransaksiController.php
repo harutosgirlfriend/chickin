@@ -48,7 +48,7 @@ class TransaksiController extends Controller
                     'gambar' => $detail->product->gambar,
                     'nama_product' => $detail->product->nama_product ?? 'Nama Produk Tidak Ditemukan',
                     'jumlah' => $detail->jumlah,
-                    'harga_satuan' => $detail->harga, // Ini adalah harga satuan produk di transaksi
+                    'harga_satuan' => $detail->harga, 
                     'subtotal' => $detail->subtotal,
                 ];
             })->toArray();

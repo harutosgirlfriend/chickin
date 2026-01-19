@@ -167,7 +167,8 @@
 
                             @foreach ($voucher as $v)
                                 <option value="{{ $v->kode_voucher }}" data-type="{{ $v->tipe_diskon }}"
-                                    data-value="{{ $v->nilai_diskon }}" data-min="{{ $v->min_belanja }}">
+                                    data-value="{{ $v->nilai_diskon }}" data-min="{{ $v->min_belanja }}"
+                                    data-max="{{ $v->maks_diskon ?? 0 }}">
                                     @if ($v->tipe_diskon === 'persen')
                                         Diskon {{ $v->nilai_diskon }}%
                                         @if ($v->maks_diskon)
@@ -398,7 +399,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Voucher belum dipilih',
-                    text: 'Silakan pilih voucher terlebih dahulu atau pilih "Tanpa Voucher"'
+                    text: 'Silakan pilih voucher terlebih dahulu'
                 });
                 return false;
             }
@@ -635,23 +636,30 @@
 
 
         function hitungTotalAkhir() {
-
             const subtotal = parseFloat($('#totalHarga').val()) || 0;
             const ongkir = parseFloat($('#ongkir').val()) || 0;
 
             const selected = $('#voucher_select option:selected');
+
             let diskon = 0;
 
-            if (selected.data('type')) {
-
+            if (selected.val()) {
                 const tipe = selected.data('type');
                 const nilai = parseFloat(selected.data('value')) || 0;
                 const min = parseFloat(selected.data('min')) || 0;
+                const max = parseFloat(selected.data('max')) || 0;
 
                 if (subtotal >= min) {
-                    diskon = tipe === 'persen' ?
-                        subtotal * (nilai / 100) :
-                        nilai;
+                    if (tipe === 'persen') {
+                        diskon = subtotal * (nilai / 100);
+                    } else {
+                        diskon = nilai;
+                    }
+
+                    // 🔒 BATASI MAKS DISKON
+                    if (max > 0) {
+                        diskon = Math.min(diskon, max);
+                    }
                 }
             }
 

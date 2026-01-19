@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 
+/**
+ * @mixin IdeHelperVouchers
+ */
 class Vouchers extends Model
 {
     protected $table = 'vouchers';
@@ -36,7 +39,7 @@ class Vouchers extends Model
         if ($this->tipe_diskon === 'persen') {
             $diskon = $subtotal * ($this->nilai_diskon / 100);
 
-            // batasi maksimal diskon (jika ada)
+    
             if ($this->maks_diskon) {
                 $diskon = min($diskon, $this->maks_diskon);
             }
@@ -44,7 +47,7 @@ class Vouchers extends Model
             return $diskon;
         }
 
-        // nominal
+    
         return min($this->nilai_diskon, $subtotal);
     }
        public function transaksi()

@@ -43,7 +43,7 @@ class CostumerController extends Controller
     {
         $request->validate([
             'nama'  => 'required|string|max:100',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'no_hp' => 'nullable|string|max:20'
         ]);
 

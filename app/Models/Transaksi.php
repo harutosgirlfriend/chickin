@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperTransaksi
+ */
 class Transaksi extends Model
 {
     protected $table = 'transaksi';

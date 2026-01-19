@@ -25,10 +25,24 @@
                             <input id="liveSearch" class="form-control border-none" type="text" name="keyword"
                                 placeholder="Cari Produk" value="">
                         </div>
-                        <button data-bs-toggle="modal" data-bs-target="#modalTambahProduct"
-                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-md">
-                            Tambah Product
-                        </button>
+                        <div class="flex space-x-3">
+                            <a href="{{ route('product.export.excel') }}"
+                                class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700">
+                                Export Stok Excel
+                            </a>
+
+                            <a href="{{ route('product.export.pdf') }}"
+                                class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                Export Stok PDF
+                            </a>
+
+                            <button data-bs-toggle="modal" data-bs-target="#modalTambahProduct"
+                                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-md">
+                                Tambah Product
+                            </button>
+                        </div>
+
+
                     </div>
                 </div>
 
@@ -90,7 +104,8 @@
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->kategori }}
                                     </td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ number_format($product->harga) }}</td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        {{ number_format($product->harga) }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-purple-100 text-purple-800">
@@ -234,7 +249,7 @@
                                                                 <img src="{{ asset('images/product/' . $img->gambar) }}"
                                                                     class="w-full h-28 object-cover rounded">
 
-                                                   
+
                                                                 @if ($img->main_gambar)
                                                                     <span
                                                                         class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-1 rounded">

@@ -302,6 +302,11 @@ class CartController extends Controller
                 ->with('error', 'Kabupaten/Kota wajib dipilih.')
                 ->withInput();
         }
+        if (! $request->metode_pembayaran) {
+            return redirect()->back()
+                ->with('error', 'Metode pembayaran wajib dipilih.')
+                ->withInput();
+        }
 
         if (! $request->kecamatan) {
             return redirect()->back()
@@ -309,13 +314,13 @@ class CartController extends Controller
                 ->withInput();
         }
         $totalHarga = 0;
-        $pembayaran = $request->metode_pembayaran; // ← ambil dari form
+        $pembayaran = $request->metode_pembayaran;
 
         if ($pembayaran == 'nontunai') {
             $payment = $this->checkStatus($request->kode_transaksi);
 
             if ($payment->status === 'lunas') {
-                $pembayaran = $payment->payment_channel;  // ← DIUBAH LAGI DISINI
+                $pembayaran = $payment->payment_channel;  
             }
         }
         if ($request->items) {
@@ -447,8 +452,8 @@ class CartController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Jumlah keranjang berhasil diperbarui.',
-                    'new_subtotal_item' => $subtotal, // <-- Kirim subtotal item baru
-                    'new_grand_total' => $grandTotal, // <-- Kirim grand total baru
+                    'new_subtotal_item' => $subtotal,
+                    'new_grand_total' => $grandTotal, 
                 ]);
             }
 

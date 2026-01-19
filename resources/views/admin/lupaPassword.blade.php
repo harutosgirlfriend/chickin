@@ -37,10 +37,10 @@
                         alt="" style="width: 70px" class="" />
                     <span class="font-bold text-lg text-[#e4c6ba] text-center flex items-center"
                         style="color: #b25353">CHICKin</span></a>
-                <p class="mb-4 text-gray-400 text-sm text-center">Masuk ke akunmu</p>
+                <p class="mb-4 text-gray-400 text-sm text-center">Masukkan akun email yang terdaftar</p>
 
-                <form action="{{ route('login') }}">
-
+                <form method="POST" action="{{ route('cek.email') }}">
+                    @csrf
                     <div class="mb-4">
                         <label for="forUsername" class="block text-sm mb-2 text-gray-400">Email</label>
                         <input type="email" id="forUsername"
@@ -48,30 +48,10 @@
                             aria-describedby="hs-input-helper-text" name="email">
                     </div>
 
-                    <div class="mb-6">
-                        <label for="forPassword" class="block text-sm  mb-2 text-gray-400">Password</label>
-                        <input type="password" id="forPassword"
-                            class="py-3 px-4 block w-full border-gray-200 rounded-sm text-sm focus:border-blue-600 focus:ring-0 "
-                            aria-describedby="hs-input-helper-text" name="password">
-                    </div>
 
-                    <div class="flex justify-between">
-                        {{-- <div class="flex"> --}}
-                        {{-- <input type="checkbox"
-                                    class="shrink-0 mt-0.5 border-gray-200 rounded-[4px] text-blue-600 focus:ring-blue-500 "
-                                    id="hs-default-checkbox" checked> --}}
-                        {{-- <label for="hs-default-checkbox" class="text-sm text-gray-500 ms-3">Ingat akun</label> --}}
-                        {{-- </div> --}}
-                        {{-- <a href="../" class="text-sm font-semibold text-blue-600 hover:text-blue-700">Lupa
-                                Password ?</a> --}}
-                    </div>
-                    @if ($errors->any())
-                        <div class="text-red-500 text-sm-mt-1 text-center">
-                            <ul>
-                                <li>{{ $errors->first() }}</li>
-                            </ul>
-                        </div>
-                    @endif
+                    @error('email')
+                        <p class="text-red-500 text-sm-mt-1">{{ $message }}</p>
+                    @enderror
 
                     <div class="grid my-6">
                         <button class="btn py-[10px] text-base text-white font-medium hover:bg-blue-700" type="submit"
@@ -80,14 +60,10 @@
 
                     <div class="flex justify-center gap-2 items-center">
                         <p class="text-base font-semibold text-gray-400">Pengguna Baru?</p>
-                        <a href="{{ route('regis') }}"
-                            class="text-sm font-semibold text-blue-600 hover:text-blue-700">Registrasi</a>
-                    </div>
-                    <div class="flex justify-center items-center">
-                        <a href="{{ route('lupa.password') }}"
-                            class="text-sm font-semibold text-blue-600 hover:text-blue-700">Lupa Password</a>
-                    </div>
+                        <a href="{{ route('login.view') }}"
+                            class="text-sm font-semibold text-blue-600 hover:text-blue-700">Kembali</a>
 
+                    </div>
             </div>
             </form>
         </div>

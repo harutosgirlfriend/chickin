@@ -11,7 +11,7 @@
                     </h2>
                     <form method="GET" class="flex flex-wrap gap-3 mb-6">
 
-     
+
                         <select name="filter" id="filterMode" class="border rounded px-3 py-2 text-sm"
                             onchange="toggleFilter()">
 
@@ -35,13 +35,13 @@
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-        
+
                         <div id="bulanan">
                             <input type="month" name="bulan" value="{{ request('bulan') }}"
                                 class="border rounded px-3 py-2 text-sm">
                         </div>
 
-             
+
                         <div id="tahunan">
                             <input type="number" name="tahun" value="{{ request('tahun') }}" placeholder="Tahun"
                                 class="border rounded px-3 py-2 text-sm w-28">
@@ -58,6 +58,11 @@
                             class="bg-green-600 text-white px-4 py-2 rounded">
                             Cetak Excel
                         </button>
+                        <button type="submit" formaction="{{ route('admin.pesanan.exportPdf') }}"
+                            class="bg-red-600 text-white px-4 py-2 rounded">
+                            Cetak PDF
+                        </button>
+
                     </form>
 
                 </div>

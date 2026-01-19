@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperChatModel
+ */
 class ChatModel extends Model
 {
     protected $table = 'chat';

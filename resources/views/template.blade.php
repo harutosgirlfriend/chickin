@@ -326,7 +326,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- RIGHT -->
+                              
                                         <div class="text-right space-y-2">
                                             @if ($item->product->stok < $item->jumlah)
                                                 <p class="text-xs text-red-600 font-medium"
