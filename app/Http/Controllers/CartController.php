@@ -12,23 +12,32 @@ use App\Models\Vouchers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Midtrans\Config;
 use Midtrans\Transaction;
 use stdClass;
 
+
 class CartController extends Controller
 {
+ 
     public function ambilDaftarVoucher($totalSubtotal)
-    {
-        return Vouchers::valid($totalSubtotal)
-            ->orderByDesc('nilai_diskon')
-            ->get()
-            ->map(function ($voucher) use ($totalSubtotal) {
-                $voucher->jumlah_diskon = $voucher->hitungDiskon($totalSubtotal);
+{
+    $voucherSudahDipakai = DB::table('transaksi')
+        ->where('id_user', Auth::id())
+        ->whereNotNull('kode_voucher')
+        ->pluck('kode_voucher');
 
-                return $voucher;
-            });
-    }
+    return Vouchers::valid($totalSubtotal)
+        ->whereNotIn('kode_voucher', $voucherSudahDipakai)
+        ->orderByDesc('nilai_diskon')
+        ->get()
+        ->map(function ($voucher) use ($totalSubtotal) {
+            $voucher->jumlah_diskon = $voucher->hitungDiskon($totalSubtotal);
+            return $voucher;
+        });
+}
+
 
     public function ambilMidtrans($params)
     {

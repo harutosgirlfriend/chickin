@@ -47,7 +47,7 @@
                 @enderror
                 <div class="mb-2">
                     <label>Maksimal Diskon(kalau tipe diskon persen)</label>
-                    <input type="number" name="maks_diskon" class="form-control" step="0.01">
+                    <input type="number" name="maks_diskon" class="form-control" step="0.01" required>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
                     <button type="submit" class="btn btn-primary">Simpan</button>

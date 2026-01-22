@@ -14,9 +14,17 @@
             padding-bottom: 10px;
         }
 
+        .kop img {
+            height: 50px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
         .kop h1 {
-            margin: 0;
+            display: inline-block;
             font-size: 22px;
+            vertical-align: middle;
+            margin: 0;
         }
 
         .kop p {
@@ -40,6 +48,11 @@
             text-align: left;
         }
 
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
         .ttd {
             width: 100%;
             margin-top: 40px;
@@ -55,6 +68,7 @@
 
     {{-- KOP --}}
     <div class="kop">
+        <img src="{{ public_path('images/logo.png') }}" alt="Logo">
         <h1>CHICKin</h1>
         <p>Sistem Manajemen User</p>
         <p>Email: admin@chickin.com | Telp: 08xxxxxxxx</p>
@@ -74,6 +88,7 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -83,6 +98,7 @@
         <tbody>
             @foreach($users as $user)
                 <tr>
+                    <td>{{ $loop->iteration }}</td> {{-- nomor urut --}}
                     <td>{{ $user->nama }}</td>
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->role }}</td>

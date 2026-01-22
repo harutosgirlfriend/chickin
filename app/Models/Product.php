@@ -30,6 +30,7 @@ class Product extends Model
         'gambar',
         'stok',
         'minimal_stok',
+        'harga_awal',
         'deskripsi',
         'kategori',
         'harga',
@@ -47,5 +48,9 @@ class Product extends Model
     public function feedback()
     {
         return $this->hasMany(Fedbacks::class, 'kode_product', 'kode_product');
+    }
+       public function logAktivitas()
+    {
+        return $this->hasMany(Logaktivitas::class, 'kode_product', 'kode_product');
     }
 }

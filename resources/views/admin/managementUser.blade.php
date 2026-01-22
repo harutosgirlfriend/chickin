@@ -3,7 +3,29 @@
 @section('content')
     <div class="p-6">
         <div class="bg-white rounded-xl shadow p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <p class="text-sm text-gray-500">Jumlah Costumer</p>
+                    <h3 class="text-2xl font-bold text-green-600">
+                        {{ $jumlahCustomer }}
+                    </h3>
+                </div>
+
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <p class="text-sm text-gray-500">Jumlah Admin</p>
+                    <h3 class="text-2xl font-bold text-orange-500">
+                        {{ $jumlahAdmin }}
+                    </h3>
+                </div>
+
+
+
+            </div>
             <div class="flex justify-between items-center">
+
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6">
                     Management User
                 </h2>

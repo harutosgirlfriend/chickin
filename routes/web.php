@@ -43,6 +43,8 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
     )->name('admin.pesanan.exportExcel');
     Route::delete('/product/gambar/{id}', [ProductController::class, 'deleteGambar'])
         ->name('product.gambar.delete');
+    Route::post('/stok/update', [ProductController::class, 'updateStok'])
+        ->name('stok.update');
 
     Route::put('/product/gambar/main/{id}', [ProductController::class, 'setMainGambar'])
         ->name('product.gambar.main');
@@ -58,11 +60,17 @@ Route::middleware(['auth', 'cekadmin'])->group(function () {
 
     Route::get('/product/export/pdf', [AdminController::class, 'exportStockPdf'])
         ->name('product.export.pdf');
-        Route::get('/admin/penghasilan/export-pdf', [AdminController::class, 'exportPdfPenghasilan'])
-    ->name('admin.penghasilan.exportPdf');
+    Route::get('/admin/penghasilan/export-pdf', [AdminController::class, 'exportPdfPenghasilan'])
+        ->name('admin.penghasilan.exportPdf');
     Route::get('/admin/pesanan/export-pdf', [AdminController::class, 'exportPdfPesanan'])
-    ->name('admin.pesanan.exportPdf');
+        ->name('admin.pesanan.exportPdf');
 
+        //loh aktivitas
+  
+
+
+    Route::get('/admin/product/log-aktivitas', [ProductController::class, 'logAktivitas'])
+        ->name('data.product.log.aktivitas');
 
 });
 

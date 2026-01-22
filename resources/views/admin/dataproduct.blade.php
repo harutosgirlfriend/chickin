@@ -4,6 +4,81 @@
 
 @section('content')
     <div class="col-span-1 xl:col-span-1 md:col-span-6">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Tabel Stok Barang</h3>
+                        <table class="table table-bordered table-hovered table-striped mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th>Nama Barang</th>
+                                    <th>Stok</th>
+                                    <th style="width: 290px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($products as $p)
+                                    <tr>
+                                        <td>{{ $p->kategori }}</td>
+                                        <td>{{ $p->nama_product }}</td>
+                                        <td>{{ $p->stok }}</td>
+                                        <td>
+                                            <form action="{{ route('stok.update') }}" method="post" class="d-flex gap-2">
+                                                @csrf
+                                                <input type="hidden" name="kode_product" value="{{ $p->kode_product }}">
+
+                                                <input type="number" name="jumlah" class="form-control form-control-sm"
+                                                    style="width:70px" min="1" required>
+
+                                                <select name="aksi" class="form-select form-select-sm"
+                                                    style="width:100px" required>
+                                                    <option value="tambah">Tambah</option>
+                                                    <option value="kurangi">Kurangi</option>
+                                                </select>
+
+                                                <button class="btn btn-sm btn-primary">OK</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                                <tr>
+                                    <th colspan="2">Total Stok</th>
+                                    <th>{{ $products->sum('stok') }}</th>
+                                    <th></th>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>TOP 4 Barang Terlaku</h3>
+                        <canvas id="chartBarangTerlaku"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{{ route('data.product.log.aktivitas') }}"
+                            class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition duration-200">
+                            <div class="bg-blue-100 p-3 rounded-lg">
+                                <i class="fas fa-history text-blue-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-semibold text-gray-800">Audit Log</h4>
+                                <p class="text-gray-600 text-sm">Log aktivitas stok</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="p-4 sm:p-6 bg-white shadow-lg rounded-lg">
 
@@ -73,6 +148,10 @@
                                 </th>
                                 <th scope="col"
                                     class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-900">
+                                    Harga awal <span class="ml-1 text-gray-400">↑</span>
+                                </th>
+                                <th scope="col"
+                                    class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-900">
                                     Kategori
                                 </th>
                                 <th scope="col"
@@ -104,7 +183,7 @@
                                         {{ $product->kode_product }}</td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $product->nama_product }}</td>
-                    
+
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         @if ($product->stok <= $product->minimal_stok)
                                             <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">
@@ -117,6 +196,9 @@
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                         {{ $product->minimal_stok }}</td>
+
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
+                                        {{ $product->harga_awal }}</td>
 
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">{{ $product->kategori }}
                                     </td>
@@ -140,14 +222,15 @@
                                         </span>
                                     </td>
                                 </tr>
-                                <div class="modal fade" id="modalDetailProduct{{ $product->kode_product }}" tabindex="-1"
-                                    aria-labelledby="modalDetailProductLabel{{ $product->kode_product }}"
+                                <div class="modal fade" id="modalDetailProduct{{ $product->kode_product }}"
+                                    tabindex="-1" aria-labelledby="modalDetailProductLabel{{ $product->kode_product }}"
                                     aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-scrollable">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title"
-                                                    id="modalDetailProductLabel{{ $product->kode_product }}">Detail Product
+                                                    id="modalDetailProductLabel{{ $product->kode_product }}">Detail
+                                                    Product
                                                 </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Tutup"></button>
@@ -215,6 +298,12 @@
                                                             <label class="form-label">Minimal Stok</label>
                                                             <input type="text" name="minimal_stok"
                                                                 class="form-control" value="{{ $product->minimal_stok }}"
+                                                                required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Harga awal</label>
+                                                            <input type="text" name="minimal_stok"
+                                                                class="form-control" value="{{ $product->harga_awal }}"
                                                                 required>
                                                         </div>
                                                         <div class="mb-3">
@@ -349,6 +438,10 @@
                                         <input type="number" name="minimal_stok" class="form-control" required>
                                     </div>
                                     <div class="mb-2">
+                                        <label>Harga Awal</label>
+                                        <input type="number" name="harga_awal" class="form-control" required>
+                                    </div>
+                                    <div class="mb-2">
                                         <label>Harga</label>
                                         <input type="number" name="harga" class="form-control" required>
                                     </div>
@@ -397,7 +490,25 @@
 
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
     <script>
+        const ctx = document.getElementById('chartBarangTerlaku');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($terlaris->pluck('nama_product')) !!},
+                datasets: [{
+                    data: {!! json_encode($terlaris->pluck('total_terjual')) !!},
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+                    ]
+                }]
+            }
+        });
         document.getElementById('liveSearch').addEventListener('keyup', function() {
             let keyword = this.value.toLowerCase();
             let rows = document.querySelectorAll('#productTable tr');

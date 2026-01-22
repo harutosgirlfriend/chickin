@@ -62,7 +62,7 @@
                                 </p>
 
                                 <p class="text-xl font-bold text-yellow-600">
-                                    {{ $item->total_harga }}
+                                      {{ number_format($item->total_harga) }}
                                 </p>
                             </div>
                         </div>

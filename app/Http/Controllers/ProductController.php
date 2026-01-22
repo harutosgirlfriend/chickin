@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Keranjang;
+use App\Models\LogAktivitas;
 use App\Models\Product;
 use App\Models\ProductGambar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 use function Laravel\Prompts\alert;
@@ -69,9 +71,54 @@ class ProductController extends Controller
 
     public function dataProduct()
     {
+        $terlaris = DB::table('detail_transaksi')
+            ->join('product', 'detail_transaksi.kode_product', '=', 'product.kode_product')
+            ->select(
+                'product.nama_product',
+                DB::raw('SUM(detail_transaksi.jumlah) as total_terjual')
+            )
+            ->groupBy('product.nama_product')
+            ->orderByDesc('total_terjual')
+            ->limit(4)
+            ->get();
+
         $products = Product::with('productgambar')->get();
 
-        return view('admin.dataproduct', compact('products'));
+        return view('admin.dataproduct', compact('products', 'terlaris'));
+    }
+
+    public function updateStok(Request $request)
+    {
+        $request->validate([
+            'kode_product' => 'required',
+            'jumlah' => 'required|integer|min:1',
+            'aksi' => 'required|in:tambah,kurangi',
+        ]);
+
+        $product = Product::where('kode_product', $request->kode_product)->firstOrFail();
+        $stokSebelum = $product->stok;
+        if ($request->aksi == 'tambah') {
+            $product->stok += $request->jumlah;
+            $aksi = 'Tambah Stok';
+        } else {
+            if ($product->stok < $request->jumlah) {
+                return back()->with('error', 'Stok tidak mencukupi');
+            }
+            $product->stok -= $request->jumlah;
+            $aksi = 'Kurangi Stok';
+        }
+
+        $product->save();
+        LogAktivitas::create([
+            'id_user' => Auth::id(),
+            'kode_product' => $product->kode_product,
+            'aksi' => $aksi,
+            'stok_sebelum' => $stokSebelum,
+            'stok_sesudah' => $product->stok
+       
+        ]);
+
+        return back()->with('success', 'Stok berhasil diperbarui');
     }
 
     public function simpan(Request $request)
@@ -79,17 +126,27 @@ class ProductController extends Controller
         //  dd($request);
 
         $namaGambar = null;
+        $kategori = $request->kategori;
 
-        $kode_product = $this->kode_product();
+        $kode_product = $this->kode_product($kategori);
         $product = Product::create([
             'kode_product' => $kode_product,
             'nama_product' => $request->nama_product,
             'harga' => $request->harga,
             'stok' => $request->stok,
             'minimal_stok' => $request->minimal_stok,
-            'kategori' => $request->kategori,
+            'harga_awal' => $request->harga_awal,
+            'kategori' => $kategori,
             'gambar' => $namaGambar,
             'deskripsi' => $request->deskripsi ?? null,
+
+        ]);
+        LogAktivitas::create([
+            'id_user' => Auth::id(),
+            'kode_product' => $kode_product,
+            'aksi' => 'Tambah Produk',
+            'stok_sebelum' => null,
+            'stok_sesudah' => $product->stok,
 
         ]);
 
@@ -132,7 +189,7 @@ class ProductController extends Controller
         ]);
 
         $product = Product::where('kode_product', $request->kode_product)->firstOrFail();
-
+        $stokSebelum = $product->stok;
         $product->update([
             'nama_product' => $request->nama_product,
             'harga' => $request->harga,
@@ -140,7 +197,14 @@ class ProductController extends Controller
             'kategori' => $request->kategori,
             'deskripsi' => $request->deskripsi,
         ]);
-
+        LogAktivitas::create([
+            'id_user' => Auth::id(),
+            'kode_product' => $product->kode_product,
+            'aksi' => 'Update Produk',
+            'stok_sebelum' => $stokSebelum,
+            'stok_sesudah' => $product->stok,
+          
+        ]);
         if ($request->hasFile('gambar')) {
 
             foreach ($request->file('gambar') as $file) {
@@ -156,25 +220,50 @@ class ProductController extends Controller
             }
         }
 
-         return redirect()
-            ->route('data.product') 
+        return redirect()
+            ->route('data.product')
             ->with('success', 'Data product berhasil diupdate');
     }
 
-    private function kode_product()
+    private function kode_product($kategori)
     {
-
         $product = Product::orderBy('kode_product', 'desc')->first();
-        if ($product) {
-            $lastIdString = $product['kode_product'];
-            $lastIdNumber = (int) substr($lastIdString, -3);
-            $nextIdNumber = $lastIdNumber + 1;
-            $nextId = 'AY'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
-        } else {
-            $nextId = 'AY001';
-        }
 
-        return $nextId;
+        if ($kategori == 'ayam potong') {
+            if ($product) {
+                $lastIdString = $product['kode_product'];
+                $lastIdNumber = (int) substr($lastIdString, -3);
+                $nextIdNumber = $lastIdNumber + 1;
+                $nextId = 'AP'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
+
+                return $nextId;
+            } else {
+                $nextId = 'AY001';
+            }
+        }
+        if ($kategori == 'ayam hidup') {
+            if ($product) {
+                $lastIdString = $product['kode_product'];
+                $lastIdNumber = (int) substr($lastIdString, -3);
+                $nextIdNumber = $lastIdNumber + 1;
+                $nextId = 'AH'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
+
+                return $nextId;
+            } else {
+                $nextId = 'AY001';
+            }
+        } else {
+            if ($product) {
+                $lastIdString = $product['kode_product'];
+                $lastIdNumber = (int) substr($lastIdString, -3);
+                $nextIdNumber = $lastIdNumber + 1;
+                $nextId = 'TR'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
+
+                return $nextId;
+            } else {
+                $nextId = 'AY001';
+            }
+        }
 
     }
 
@@ -187,11 +276,11 @@ class ProductController extends Controller
             File::delete($path);
         }
 
-        $kodeProduct = $gambar->kode_product; 
+        $kodeProduct = $gambar->kode_product;
         $gambar->delete();
 
         return redirect()
-            ->route('data.product') 
+            ->route('data.product')
             ->with('success', 'Gambar berhasil dihapus');
     }
 
@@ -206,5 +295,15 @@ class ProductController extends Controller
         $gambar->update(['main_gambar' => 1]);
 
         return redirect()->back()->with('success', 'Gambar utama berhasil diubah');
+    }
+
+    public function LogAktivitas()
+    {
+        $logs = LogAktivitas::with(['product', 'users'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        // dd($logs);
+        return view('admin.logAktivitas', compact('logs'));
     }
 }

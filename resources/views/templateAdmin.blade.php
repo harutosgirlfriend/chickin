@@ -61,7 +61,7 @@
                         </li>
 
                         <li class="sidebar-item ">
-                            <a class="sidebar-link{{ request()->routeIs('data.product') ? ' active' : '' }}" href="{{ route('data.product') }}">
+                            <a class="sidebar-link{{ request()->routeIs('data.product*') ? ' active' : '' }}" href="{{ route('data.product') }}">
                                 <span><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -123,7 +123,7 @@
 
                                 </span>
 
-                                <span class="hide-menu">Penghasilan</span>
+                                <span class="hide-menu">Keuangan</span>
 
                             </a>
                         </li>

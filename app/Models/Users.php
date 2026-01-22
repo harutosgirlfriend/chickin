@@ -44,4 +44,8 @@ class Users extends Model implements Authenticatable
     {
         return $this->hasMany(Fedbacks::class, 'id_user', 'id');
     }
+     public function logAktivitas()
+    {
+        return $this->hasMany(Logaktivitas::class, 'id_user', 'id');
+    }
 }

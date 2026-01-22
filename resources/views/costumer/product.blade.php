@@ -3,8 +3,8 @@
 @section('title', 'Daftar Produk')
 
 @section('content')
-        @if ($product->isNotEmpty())
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-stretch p-10 ">
+    @if ($product->isNotEmpty())
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-stretch p-10 ">
 
             @foreach ($product as $p)
                 @php
@@ -16,17 +16,18 @@
 
                 <div>
                     <div class="card rounded-md bg-white p-3 shadow-xl shadow-[#e4c6ba]/50 flex flex-col h-95">
-                        <div class="relative">
+                        <div class="relative w-full h-40 overflow-hidden rounded">
                             <img src="{{ asset('images/product/' . $p->gambar) }}" alt="{{ $p->nama_product }}"
-                                class="object-cover rounded">
+                                class="w-full h-full object-cover">
 
-                            <?php if ($p->stok <= 0): ?>
-                            <div class="absolute bottom-0 left-0 w-full py-2 bg-black bg-opacity-1 text-white text-center font-bold text-lg z-10"
-                                style="background-color: rgba(0, 0, 0, 0.5);">
-                                stok habis
-                            </div>
-                            <?php endif; ?>
+                            @if ($p->stok <= 0)
+                                <div class="absolute bottom-0 left-0 w-full py-2 text-white text-center font-bold text-sm"
+                                    style="background-color: rgba(0, 0, 0, 0.5);">
+                                    stok habis
+                                </div>
+                            @endif
                         </div>
+
 
                         <div class="mt-auto flex flex-col items-center justify-center">
                             <div class="text-center px-2 w-40">
@@ -42,7 +43,7 @@
                                 </p>
                             </div>
 
-                            <div class="text-center flex items-center gap-2">
+                            <div class="text-center flex items-center gap-2 mb-2">
 
                                 <div class="flex items-center justify-center gap-1 mt-1">
                                     @for ($i = 1; $i <= 5; $i++)
@@ -67,14 +68,13 @@
                     </div>
                 </div>
             @endforeach
-     
-    </div>
-       @else
-            <div class="flex w-full flex-col items-center justify-center p-6 text-center ">
-                <div class="w-1/4">
+
+        </div>
+    @else
+        <div class="flex w-full flex-col items-center justify-center p-6 text-center ">
+            <div class="w-1/4">
                 <div class="mb-8 p-4 w-full rounded-lg relative">
-                    <div
-                        class="w-full h-40 flex flex-col items-center justify-center  relative">
+                    <div class="w-full h-40 flex flex-col items-center justify-center  relative">
                         <div class="w-full h-40 bg-orange-300 rounded-t-lg -mt-4 relative transform -rotate-2 shadow-inner">
                             <div class="absolute inset-x-0 bottom-0 h-1/2 bg-orange-200"></div>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
@@ -95,9 +95,9 @@
                 </div>
 
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Produk tidak tersedia</h2>
-              
 
-                </div>
+
             </div>
-        @endif
+        </div>
+    @endif
 @endsection

@@ -118,15 +118,16 @@
                                 <span class="text-sm text-gray-500 ml-1">{{ $fb->user->nama ?? 'Anonim' }}</span>
                             </div>
                             <p class="text-gray-700 text-sm mb-1">{{ $fb->comment }}</p>
-
-                                @if ($fb->photos->isNotEmpty())
-                                    <div class="flex gap-2 mt-1 flex-wrap">
-                                        @foreach ($fb->photos as $foto)
-                                            <img src="{{ asset('storage/' . $foto->foto) }}" alt="Foto Feedback"
-                                                class="w-24 h-24 object-cover rounded-md">
-                                        @endforeach
-                                    </div>
-                                @endif
+                            
+                            @if ($fb->photos->isNotEmpty())
+                            <div class="flex gap-2 mt-1 flex-wrap">
+                                @foreach ($fb->photos as $foto)
+                                <img src="{{ asset('storage/' . $foto->foto) }}" alt="Foto Feedback"
+                                class="w-24 h-24 object-cover rounded-md">
+                                @endforeach
+                            </div>
+                            @endif
+                            <p class="text-gray-700 text-sm mb-1"> {{ $fb->created_at->locale('id')->translatedFormat('d F Y H:i') }}</p>
                           
                         </div>
                     @endforeach

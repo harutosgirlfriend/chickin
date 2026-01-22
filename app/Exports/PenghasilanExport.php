@@ -2,24 +2,20 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class PenghasilanExport implements
-    FromCollection,
-    WithHeadings,
-    WithMapping,
-    WithCustomStartCell,
-    WithStyles
+class PenghasilanExport implements FromCollection, WithCustomStartCell, WithHeadings, WithMapping, WithStyles
 {
     protected $data;
-    protected $filter; // range / bulanan / tahunan
+    protected $filter;
     protected $tanggalAwal;
     protected $tanggalAkhir;
     protected $bulan;
@@ -37,7 +33,7 @@ class PenghasilanExport implements
 
     public function startCell(): string
     {
-        return 'A7';
+        return 'B7';
     }
 
     public function collection()
@@ -48,6 +44,7 @@ class PenghasilanExport implements
     public function headings(): array
     {
         return [
+            'No', // Nomor urut
             'Kode Transaksi',
             'Tanggal',
             'Jumlah Produk',
@@ -62,8 +59,10 @@ class PenghasilanExport implements
 
     public function map($penghasilan): array
     {
-        $totalHargaAwal = 0;
+        static $no = 0;
+        $no++;
 
+        $totalHargaAwal = 0;
         foreach ($penghasilan->details as $detail) {
             $totalHargaAwal += ($detail->product->harga_awal ?? 0) * ($detail->jumlah ?? 1);
         }
@@ -71,6 +70,7 @@ class PenghasilanExport implements
         $labaBersih = $penghasilan->total_harga - $totalHargaAwal - ($penghasilan->jumlah_potongan ?? 0);
 
         return [
+            $no,
             $penghasilan->kode_transaksi,
             $penghasilan->tanggal,
             $penghasilan->jumlah_produk,
@@ -85,54 +85,91 @@ class PenghasilanExport implements
 
     public function styles(Worksheet $sheet)
     {
-        /* ===== KOP ===== */
-        $sheet->mergeCells('A1:I1');
-        $sheet->setCellValue('A1', 'CHICKin');
+        /* ===== LOGO ===== */
+        $drawing = new Drawing();
+        $drawing->setName('Logo');
+        $drawing->setPath(public_path('images/logo.png')); // Path logo
+        $drawing->setHeight(50);
+        $drawing->setCoordinates('A1'); // Tempat logo
+        $drawing->setWorksheet($sheet);
 
-        $sheet->mergeCells('A2:I2');
-        $sheet->setCellValue('A2', 'LAPORAN PENGHASILAN');
+        /* ===== KOP ===== */
+        $sheet->mergeCells('B1:K1');
+        $sheet->setCellValue('B1', 'CHICKin');
+
+        $sheet->mergeCells('B2:K2');
+        $sheet->setCellValue('B2', 'LAPORAN KEUANGAN');
 
         // Keterangan filter otomatis
-        $sheet->mergeCells('A3:I3');
+        $sheet->mergeCells('B3:K3');
         $keterangan = '';
         if ($this->filter === 'range' && $this->tanggalAwal && $this->tanggalAkhir) {
-            $keterangan = 'Periode: ' . Carbon::parse($this->tanggalAwal)->format('d F Y')
-                . ' s/d ' . Carbon::parse($this->tanggalAkhir)->format('d F Y');
+            $keterangan = 'Periode: '.Carbon::parse($this->tanggalAwal)->format('d F Y')
+                .' s/d '.Carbon::parse($this->tanggalAkhir)->format('d F Y');
         } elseif ($this->filter === 'bulanan' && $this->bulan) {
-            $keterangan = 'Bulanan: ' . Carbon::parse($this->bulan)->translatedFormat('F Y');
+            $keterangan = 'Bulanan: '.Carbon::parse($this->bulan)->translatedFormat('F Y');
         } elseif ($this->filter === 'tahunan' && $this->tahun) {
-            $keterangan = 'Tahunan: ' . $this->tahun;
+            $keterangan = 'Tahunan: '.$this->tahun;
         } else {
-            $keterangan = 'Tanggal: ' . Carbon::now()->translatedFormat('d F Y');
+            $keterangan = 'Tanggal: '.Carbon::now()->translatedFormat('d F Y');
         }
-        $sheet->setCellValue('A3', $keterangan);
+        $sheet->setCellValue('B3', $keterangan);
 
-        // Style kop
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-        $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('B1:B3')->getFont()->setBold(true);
+        $sheet->getStyle('B1')->getFont()->setSize(16);
+        $sheet->getStyle('B1:B3')->getAlignment()->setHorizontal('center');
 
         /* ===== HEADER ===== */
-        $sheet->getStyle('A7:I7')->getFont()->setBold(true);
-        $sheet->getStyle('A7:I7')
-            ->getBorders()->getAllBorders()->setBorderStyle('thin');
+        $sheet->getStyle('B7:K7')->getFont()->setBold(true);
+        $sheet->getStyle('B7:K7')->getBorders()->getAllBorders()->setBorderStyle('thin');
 
         /* ===== DATA ===== */
         $lastRow = 7 + $this->data->count();
-        $sheet->getStyle("A7:I{$lastRow}")
+
+        $sheet->getStyle("B7:K{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle('thin');
 
+        /* ===== TOTAL ===== */
+        $grandTotalHarga = $this->data->sum('total_harga');
+        $grandTotalHargaAwal = $this->data->sum(function($row){
+            $total = 0;
+            foreach($row->details as $d){
+                $total += ($d->product->harga_awal ?? 0) * ($d->jumlah ?? 1);
+            }
+            return $total;
+        });
+        $grandTotalPotongan = $this->data->sum('jumlah_potongan');
+        $grandTotalOngkir = $this->data->sum('ongkir');
+        $grandTotalLaba = $this->data->sum(function($row){
+            $totalAwal = 0;
+            foreach($row->details as $d){
+                $totalAwal += ($d->product->harga_awal ?? 0) * ($d->jumlah ?? 1);
+            }
+            return $row->total_harga - $totalAwal - ($row->jumlah_potongan ?? 0);
+        });
+
+        $totalRow = $lastRow + 1;
+        $sheet->mergeCells("B{$totalRow}:D{$totalRow}");
+        $sheet->setCellValue("B{$totalRow}", 'TOTAL');
+        $sheet->setCellValue("E{$totalRow}", $grandTotalHarga);
+        $sheet->setCellValue("F{$totalRow}", $grandTotalHargaAwal);
+        $sheet->setCellValue("H{$totalRow}", $grandTotalPotongan);
+        $sheet->setCellValue("I{$totalRow}", $grandTotalOngkir);
+        $sheet->setCellValue("K{$totalRow}", $grandTotalLaba);
+
+        $sheet->getStyle("B{$totalRow}:K{$totalRow}")->getFont()->setBold(true);
+        $sheet->getStyle("B{$totalRow}:K{$totalRow}")->getBorders()->getAllBorders()->setBorderStyle('thin');
+
         /* ===== TANDA TANGAN ===== */
-        $ttdRow = $lastRow + 3;
+        $ttdRow = $totalRow + 3;
+        $sheet->mergeCells("J{$ttdRow}:K{$ttdRow}");
+        $sheet->setCellValue("J{$ttdRow}", 'Mengetahui,');
 
-        $sheet->mergeCells("H{$ttdRow}:I{$ttdRow}");
-        $sheet->setCellValue("H{$ttdRow}", 'Mengetahui,');
+        $sheet->mergeCells("J".($ttdRow+2).":K".($ttdRow+2));
+        $sheet->setCellValue("J".($ttdRow+2), '____________________');
 
-        $sheet->mergeCells("H".($ttdRow + 4).":I".($ttdRow + 4));
-        $sheet->setCellValue("H".($ttdRow + 4), '____________________');
-
-        $sheet->mergeCells("H".($ttdRow + 5).":I".($ttdRow + 5));
-        $sheet->setCellValue("H".($ttdRow + 5), 'Admin');
+        $sheet->mergeCells("J".($ttdRow+3).":K".($ttdRow+3));
+        $sheet->setCellValue("J".($ttdRow+3), 'Admin');
 
         return [];
     }

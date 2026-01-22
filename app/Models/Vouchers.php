@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @mixin IdeHelperVouchers
@@ -16,22 +16,30 @@ class Vouchers extends Model
     protected $primaryKey = 'kode_voucher';
 
     protected $fillable = [
-        'kode', 'nilai_diskon', 'min_belanja', 'mulai_berlaku', 'kadaluarsa_pada','maks_diskon', 'tipe_diskon'
+        'kode', 'nilai_diskon', 'min_belanja', 'mulai_berlaku', 'kadaluarsa_pada', 'maks_diskon', 'tipe_diskon',
     ];
 
     protected $dates = [
         'mulai_berlaku', 'kadaluarsa_pada',
     ];
-        protected $casts = [
-         'mulai_berlaku' => 'datetime',
-         'kadaluarsa_pada' => 'datetime',
+
+    protected $casts = [
+        'mulai_berlaku' => 'datetime',
+        'kadaluarsa_pada' => 'datetime',
     ];
+
     public function scopeValid(Builder $query, float $subtotal)
     {
         return $query
             ->where('mulai_berlaku', '<=', now())
             ->where('kadaluarsa_pada', '>=', now())
-            ->where('min_belanja', '<=', $subtotal);
+            ->where('min_belanja', '<=', $subtotal)
+            ->whereNotIn('kode_voucher', function ($q) {
+                $q->select('kode_voucher')
+                    ->from('transaksi')
+                    ->where('id_user', Auth::id())
+                    ->whereNotNull('kode_voucher');
+            });
     }
 
     public function hitungDiskon(float $subtotal): float
@@ -39,7 +47,6 @@ class Vouchers extends Model
         if ($this->tipe_diskon === 'persen') {
             $diskon = $subtotal * ($this->nilai_diskon / 100);
 
-    
             if ($this->maks_diskon) {
                 $diskon = min($diskon, $this->maks_diskon);
             }
@@ -47,10 +54,10 @@ class Vouchers extends Model
             return $diskon;
         }
 
-    
         return min($this->nilai_diskon, $subtotal);
     }
-       public function transaksi()
+
+    public function transaksi()
     {
         return $this->hasMany(Transaksi::class, 'kode_voucher', 'kode_voucher');
     }

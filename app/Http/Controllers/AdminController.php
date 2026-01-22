@@ -81,7 +81,7 @@ class AdminController extends Controller
             'produkTerlaris',
             'bulan',
             'totalBulanan',
-             'produkKurangStok'
+            'produkKurangStok'
         ));
 
     }
@@ -171,10 +171,13 @@ class AdminController extends Controller
 
     public function managementUser()
     {
-        $users = Users::where('role', 'customer')
-            ->get();
 
-        return view('admin.managementUser', ['users' => $users]);
+        $users = Users::all();
+        $jumlahCustomer = Users::where('role', 'customer')->count();
+
+        $jumlahAdmin = Users::where('role', 'admin')->count();
+
+        return view('admin.managementUser', ['users' => $users, 'jumlahCustomer' => $jumlahCustomer, 'jumlahAdmin' => $jumlahAdmin]);
 
     }
 
