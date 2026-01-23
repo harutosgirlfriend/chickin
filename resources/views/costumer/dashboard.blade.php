@@ -209,7 +209,7 @@
             <a href="{{ route('detail', ['kode_product' => $p->kode_product]) }}">
 
                 <div class="card rounded-md bg-white p-2 shadow-xl shadow-[#e4c6ba]/50 flex flex-col h-90">
-                    <div class="relative">
+                    <div class="relative w-full h-40 overflow-hidden rounded">
                         <img src="{{ asset('images/product/' . $p->gambar) }}" alt="{{ $p->nama_product }}"
                             class="object-cover rounded">
                         <?php if ($p->stok <=0 ): ?>
@@ -229,7 +229,7 @@
                                 aliquid, architecto quae suscipit.</p>
                         </div>
 
-                        <div class="text-center flex items-center gap-2">
+                        <div class="text-center flex items-center gap-2 mb-2">
                             <p class="text-sm font-bold"> Rp {{ number_format($p->harga) }}</p>
 
                             <button
@@ -251,7 +251,7 @@
     <footer class="bg-[#e4c6ba] text-[#5a1a0c] mt-20 shadow-xl shadow-[#e4c6ba]/70 rounded-md">
         <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
-         
+
             <div>
                 <h2 class="text-2xl font-bold text-[#a01800] mb-2">CHICKin</h2>
                 <p class="text-sm leading-relaxed">
@@ -260,7 +260,7 @@
                 </p>
             </div>
 
-    
+
             <div>
                 <h3 class="text-lg font-semibold text-[#a01800] mb-3">Lokasi Toko</h3>
                 <p class="text-sm mb-3">
@@ -279,11 +279,11 @@
                 </a>
             </div>
 
-  
+
             <div>
                 <h3 class="text-lg font-semibold text-[#a01800] mb-3">Ikuti Kami</h3>
                 <div class="flex gap-4">
-       
+
                     <a href="https://www.instagram.com/USERNAME_KAMU" target="_blank"
                         class="text-white hover:text-[#f0e9e9] transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"

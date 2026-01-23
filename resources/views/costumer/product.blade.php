@@ -18,7 +18,7 @@
                     <div class="card rounded-md bg-white p-3 shadow-xl shadow-[#e4c6ba]/50 flex flex-col h-95">
                         <div class="relative w-full h-40 overflow-hidden rounded">
                             <img src="{{ asset('images/product/' . $p->gambar) }}" alt="{{ $p->nama_product }}"
-                                class="w-full h-full object-cover">
+                                class="object-cover rounded">
 
                             @if ($p->stok <= 0)
                                 <div class="absolute bottom-0 left-0 w-full py-2 text-white text-center font-bold text-sm"
