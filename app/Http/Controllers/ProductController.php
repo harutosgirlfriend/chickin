@@ -225,47 +225,27 @@ class ProductController extends Controller
             ->with('success', 'Data product berhasil diupdate');
     }
 
-    private function kode_product($kategori)
-    {
-        $product = Product::orderBy('kode_product', 'desc')->first();
+private function kode_product($kategori)
+{
+    $prefix = match ($kategori) {
+        'ayam potong' => 'AP',
+        'ayam hidup'  => 'AH',
+        default       => 'TR',
+    };
 
-        if ($kategori == 'ayam potong') {
-            if ($product) {
-                $lastIdString = $product['kode_product'];
-                $lastIdNumber = (int) substr($lastIdString, -3);
-                $nextIdNumber = $lastIdNumber + 1;
-                $nextId = 'AP'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
+    $product = Product::where('kode_product', 'like', $prefix.'%')
+        ->orderBy('kode_product', 'desc')
+        ->first();
 
-                return $nextId;
-            } else {
-                $nextId = 'AY001';
-            }
-        }
-        if ($kategori == 'ayam hidup') {
-            if ($product) {
-                $lastIdString = $product['kode_product'];
-                $lastIdNumber = (int) substr($lastIdString, -3);
-                $nextIdNumber = $lastIdNumber + 1;
-                $nextId = 'AH'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
-
-                return $nextId;
-            } else {
-                $nextId = 'AY001';
-            }
-        } else {
-            if ($product) {
-                $lastIdString = $product['kode_product'];
-                $lastIdNumber = (int) substr($lastIdString, -3);
-                $nextIdNumber = $lastIdNumber + 1;
-                $nextId = 'TR'.str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
-
-                return $nextId;
-            } else {
-                $nextId = 'AY001';
-            }
-        }
-
+    if ($product) {
+        $lastNumber = (int) substr($product->kode_product, -3);
+        $nextNumber = $lastNumber + 1;
+    } else {
+        $nextNumber = 1;
     }
+
+    return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+}
 
     public function deleteGambar($id)
     {

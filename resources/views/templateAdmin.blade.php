@@ -47,21 +47,24 @@
 
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link{{ request()->routeIs('dashboard.admin') ? ' active' : '' }}" href="{{ route('dashboard.admin') }}">
+                            <a class="sidebar-link{{ request()->routeIs('dashboard.admin') ? ' active' : '' }}"
+                                href="{{ route('dashboard.admin') }}">
                                 <span><iconify-icon icon="mdi:view-dashboard" class="fs-6"></iconify-icon></span>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
                         </li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link{{ request()->routeIs('admin.menegement.user') ? ' active' : '' }}" href="{{ route('admin.menegement.user') }}">
+                            <a class="sidebar-link{{ request()->routeIs('admin.menegement.user') ? ' active' : '' }}"
+                                href="{{ route('admin.menegement.user') }}">
                                 <span><iconify-icon icon="mdi:account-plus" class="fs-6"></iconify-icon></span>
                                 <span class="hide-menu">Management Users</span>
                             </a>
                         </li>
 
                         <li class="sidebar-item ">
-                            <a class="sidebar-link{{ request()->routeIs('data.product*') ? ' active' : '' }}" href="{{ route('data.product') }}">
+                            <a class="sidebar-link{{ request()->routeIs('data.product*') ? ' active' : '' }}"
+                                href="{{ route('data.product') }}">
                                 <span><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -72,7 +75,8 @@
                             </a>
                         </li>
                         <li class="sidebar-item ">
-                            <a class="sidebar-link{{ request()->routeIs('admin.pesanan.*') ? ' active' : '' }}" href="{{ route('admin.pesanan') }}">
+                            <a class="sidebar-link{{ request()->routeIs('admin.pesanan.*') ? ' active' : '' }}"
+                                href="{{ route('admin.pesanan') }}">
                                 <span><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -84,7 +88,8 @@
                             </a>
                         </li>
                         <li class="sidebar-item ">
-                            <a class="sidebar-link{{ request()->routeIs('admin.vouchers.*') ? ' active' : '' }}" href="{{ route('admin.vouchers.index') }}">
+                            <a class="sidebar-link{{ request()->routeIs('admin.vouchers.*') ? ' active' : '' }}"
+                                href="{{ route('admin.vouchers.index') }}">
                                 <span><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path
@@ -171,7 +176,13 @@
                                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up"
                                     aria-labelledby="drop2">
                                     <div class="message-body">
-                                        <a href="/logout" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                                        <form action="{{ route('logout') }}" method="POST" class="mx-3 mt-2">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-primary w-100">
+                                                Logout
+                                            </button>
+                                        </form>
+
                                     </div>
                                 </div>
                             </li>

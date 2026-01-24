@@ -10,7 +10,7 @@
             <div
                 class="w-full md:w-1/3 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col items-center">
 
-  
+
                 <form action="{{ route('costumer.profile.updatePhoto') }}" method="POST" enctype="multipart/form-data"
                     id="photoForm1">
                     @csrf
@@ -51,10 +51,17 @@
                         <span class="text-lg">🔒</span> Login & Password
                     </a>
 
-                    <a href="{{ route('logout') }}"
-                        class="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-2xl transition cursor-pointer mt-4">
+                    <a href="#"
+                        class="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-2xl transition cursor-pointer mt-4"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <span class="text-lg">🚪</span> Log Out
                     </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
+
+
+
 
                 </div>
             </div>
@@ -128,7 +135,7 @@
                     <div class="flex flex-col md:flex-row gap-4 pt-6">
 
                         <button type="submit"
-                         class=" bg-[#b25353] w-full text-white font-bold rounded-xl hover:bg-[#b25353] shadow-lg shadow-orange-200  px-6 py-2 transition duration-200">simpan</button>
+                            class=" bg-[#b25353] w-full text-white font-bold rounded-xl hover:bg-[#b25353] shadow-lg shadow-orange-200  px-6 py-2 transition duration-200">simpan</button>
                     </div>
                 </form>
             </div>

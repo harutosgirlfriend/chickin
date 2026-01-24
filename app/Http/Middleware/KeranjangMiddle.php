@@ -17,7 +17,7 @@ class KeranjangMiddle
      */
     public function handle(Request $request, Closure $next): Response
     {
-  $total_item=0;
+        $total_item = 0;
         if (Auth::check()) {
             $keranjang = Keranjang::with(['product', 'user'])
                 ->where('id_user', Auth::id())
@@ -33,7 +33,11 @@ class KeranjangMiddle
             view()->share(['keranjang' => $keranjang, 'total_item' => $total_item]);
             //    dd($keranjang);
         }
- view()->share(['total_item' => $total_item]);
+        view()->share(['total_item' => $total_item]);
+
         return $next($request);
+        if (! $auth = Auth::user()) {
+            return redirect()->route('login.view');
+        }
     }
 }

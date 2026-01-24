@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
-
 class HomeController extends Controller
 {
     public function index()
@@ -126,7 +125,7 @@ class HomeController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('status', 'Anda telah logout.');
+        return redirect('/login/view')->with('status', 'Anda telah logout.');
     }
 
     public function lupaPassword()
@@ -173,42 +172,39 @@ class HomeController extends Controller
 
     }
 
- public function aturPasswordAction(Request $request)
-{
-    $request->validate([
-        'token' => 'required',
-        'password' => 'required|min:8|confirmed',
-    ], [
-        'password.required' => 'Password wajib diisi',
-        'password.min' => 'Password minimal 8 karakter',
-        'password.confirmed' => 'Konfirmasi password tidak cocok',
-    ]);
+    public function aturPasswordAction(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ], [
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
 
-    $reset = PasswordResetToken::where('token', $request->token)->first();
-    // dd($reset->email);
+        $reset = PasswordResetToken::where('token', $request->token)->first();
+        // dd($reset->email);
 
-    if (!$reset) {
+        if (! $reset) {
+            return redirect()->route('login.view')
+                ->withErrors(['password' => 'Token reset tidak valid atau sudah kadaluarsa']);
+        }
+
+        $user = Users::where('email', $reset->email)->first();
+
+        if (! $user) {
+            return redirect()->route('atur.password')
+                ->withErrors(['password' => 'User tidak ditemukan']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        PasswordResetToken::where('email', $reset->email)->delete();
+
         return redirect()->route('login.view')
-            ->withErrors(['password' => 'Token reset tidak valid atau sudah kadaluarsa']);
+            ->with('success', 'Password berhasil diubah, silakan login');
     }
-
-    $user = Users::where('email', $reset->email)->first();
-
-    if (!$user) {
-        return redirect()->route('atur.password')
-            ->withErrors(['password' => 'User tidak ditemukan']);
-    }
-
-    $user->update([
-        'password' => Hash::make($request->password),
-    ]);
-
-    PasswordResetToken::where('email', $reset->email)->delete();
-
-    return redirect()->route('login.view')
-        ->with('success', 'Password berhasil diubah, silakan login');
-}
-
-
-
 }

@@ -209,9 +209,16 @@
 
                                 <a href="{{ route('costumer.profile') }}"
                                     class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]">Profile</a>
-                                <a href="{{ route('logout') }}"
-                                    class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]">Sign
-                                    out</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm font-bold text-[#a01800] focus:bg-gray-100 focus:outline-hidden hover:text-[#b25353] hover:bg-[#f0e9e9]"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    Sign out
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                    @csrf
+                                </form>
+
                             </el-menu>
                         </el-dropdown>
                     @endauth
@@ -326,7 +333,7 @@
                                             </div>
                                         </div>
 
-                              
+
                                         <div class="text-right space-y-2">
                                             @if ($item->product->stok < $item->jumlah)
                                                 <p class="text-xs text-red-600 font-medium"

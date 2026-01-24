@@ -28,7 +28,7 @@ Route::middleware(['keranjang', 'checkout'])->group(function () {
     Route::get('/simpan/transaksi', [CartController::class, 'transaksi'])->name('simpan.transaksi');
 
 });
-Route::middleware(['auth', 'cekadmin'])->group(function () {
+Route::middleware(['login', 'cekadmin'])->group(function () {
     Route::get('/data/product', [ProductController::class, 'dataProduct'])->name('data.product');
     Route::get('/dashboard/admin', [AdminController::class, 'dashboard'])->name('dashboard.admin');
     Route::get('/admin/datapesanan', [AdminController::class, 'pesanan'])->name('admin.pesanan');
@@ -98,7 +98,7 @@ Route::middleware(['keranjang'])->group(function () {
     Route::match(['get', 'post'], '/atur/password/{token}', [HomeController::class, 'aturPassword'])->name('atur.password');
     Route::match(['get', 'post'], '/action', [HomeController::class, 'aturPasswordAction'])->name('password.action');
 
-    Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
+    Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
     Route::get('/pesanan', [TransaksiController::class, 'pesanan'])->name('pesanan');
     Route::get('/pesanan/detail/{kode_transaksi}', [TransaksiController::class, 'detailPesanan'])->name('detail.pesanan');
     Route::get('/edit/product/{kode_product}', [ProductController::class, 'editProduct'])->name('edit.product');

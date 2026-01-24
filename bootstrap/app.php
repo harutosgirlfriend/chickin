@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'cekadmin' => \App\Http\Middleware\CekAdmin::class,
             'keranjang' => \App\Http\Middleware\KeranjangMiddle::class,
             'checkout' => \App\Http\Middleware\Checkout::class,
+            'login' => \App\Http\Middleware\login::class,
         ]); //
 
     })

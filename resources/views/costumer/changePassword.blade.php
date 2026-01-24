@@ -34,11 +34,14 @@
        : 'text-gray-500 hover:bg-gray-50' }}">
                         <span class="text-lg">🔒</span> Login & Password
                     </a>
-
-                    <a href="{{ route('logout') }}"
-                        class="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-2xl transition cursor-pointer mt-4">
+                    <a href="#"
+                        class="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-2xl transition cursor-pointer mt-4"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <span class="text-lg">🚪</span> Log Out
                     </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
                 </div>
             </div>
 

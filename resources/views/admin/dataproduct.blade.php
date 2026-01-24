@@ -473,7 +473,7 @@
 
                                     <div class="mb-2">
                                         <label>Gambar</label>
-                                        <input type="file" name="gambar[]" class="form-control" multiple>
+                                        <input type="file" name="gambar[]" class="form-control" multiple required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
